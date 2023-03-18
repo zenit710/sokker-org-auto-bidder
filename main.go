@@ -20,6 +20,17 @@ func main() {
 		fmt.Println("make bid for listed players")
 	case "add":
 		addCmd.Parse(os.Args[2:])
+
+		if *playerId <= 0 {
+			fmt.Println("playerId has to be greater than zero")
+			os.Exit(1)
+		}
+
+		if *maxPrice <= 0 {
+			fmt.Println("maxPrice has to be greater than zero")
+			os.Exit(1)
+		}
+
 		fmt.Println("add player to bid list")
 		fmt.Println("id:", *playerId)
 		fmt.Println("max price:", *maxPrice)
