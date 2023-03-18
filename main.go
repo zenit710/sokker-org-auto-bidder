@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 )
@@ -10,11 +11,18 @@ func main() {
 		wrongSubcommand()
 	}
 
+	addCmd := flag.NewFlagSet("bid", flag.ExitOnError)
+	playerId := addCmd.Int("playerId", 0, "Player ID")
+	maxPrice := addCmd.Int("maxPrice", 0, "Maxium price for player to bid")
+
 	switch os.Args[1] {
 	case "bid":
 		fmt.Println("make bid for listed players")
 	case "add":
+		addCmd.Parse(os.Args[2:])
 		fmt.Println("add player to bid list")
+		fmt.Println("id:", *playerId)
+		fmt.Println("max price:", *maxPrice)
 	default:
 		wrongSubcommand()
 	}
