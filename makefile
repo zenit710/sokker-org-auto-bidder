@@ -1,2 +1,2 @@
 build:
-	go build main.go
+	go build cmd/sokker-org-auto-bidder/main/main.go
