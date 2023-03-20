@@ -1,20 +1,42 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
+	"log"
 	"os"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
+	// check subcommand is provided
 	if len(os.Args) < 2 {
 		wrongSubcommand()
 	}
 
+	// init db connections
+	db, err := sql.Open("sqlite3", "./bidder.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	// ensure db tables structure created
+	sqlStmt := `create table if not exists players (playerId integer not null primary key, maxPrice integer not null);`
+	_, err = db.Exec(sqlStmt)
+	if err != nil {
+		log.Printf("%q: %s\n", err, sqlStmt)
+		return
+	}
+
+	// define 'add' subcommand flags set
 	addCmd := flag.NewFlagSet("add", flag.ExitOnError)
 	playerId := addCmd.Int("playerId", 0, "Player ID")
 	maxPrice := addCmd.Int("maxPrice", 0, "Maxium price for player to bid")
 
+	// choose subcommand to run
 	switch os.Args[1] {
 	case "bid":
 		fmt.Println("make bid for listed players")
