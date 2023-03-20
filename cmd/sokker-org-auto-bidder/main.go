@@ -11,7 +11,7 @@ func main() {
 		wrongSubcommand()
 	}
 
-	addCmd := flag.NewFlagSet("bid", flag.ExitOnError)
+	addCmd := flag.NewFlagSet("add", flag.ExitOnError)
 	playerId := addCmd.Int("playerId", 0, "Player ID")
 	maxPrice := addCmd.Int("maxPrice", 0, "Maxium price for player to bid")
 
