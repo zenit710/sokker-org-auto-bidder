@@ -1,32 +1,58 @@
-package repository
+package player
 
 import (
 	"database/sql"
 	"fmt"
 	"sokker-org-auto-bidder/internal/model"
+	"sokker-org-auto-bidder/internal/repository"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type SqlRepository struct {
+var _ PlayerRepository = &sqlitePlayerRepository{}
+
+type sqlitePlayerRepository struct {
+	path string
 	db *sql.DB
 }
 
-func NewDbRepository(db *sql.DB) *SqlRepository {
-	return &SqlRepository{db}
+func NewSqlitePlayerRepository(path string) *sqlitePlayerRepository {
+	return &sqlitePlayerRepository{path: path}
 }
 
-func (r *SqlRepository) Init() error {
+func (r *sqlitePlayerRepository) OpenConnection() error {
+	db, err := sql.Open("sqlite3", r.path)
+	if err != nil {
+		return err
+	}
+	r.db = db 
+
+	return nil
+}
+
+func (r *sqlitePlayerRepository) CreateSchema() error {
 	sqlStmt := `create table if not exists players (playerId integer not null primary key, maxPrice integer not null);`
 
 	if _, err := r.db.Exec(sqlStmt); err != nil {
-		return &ErrRepositoryInitFailure{fmt.Sprintf("%q: %s", err.Error(), sqlStmt)}		
+		return repository.NewErrRepositoryInitFailure(fmt.Sprintf("%q: %s", err.Error(), sqlStmt))	
 	}
 
 	return nil
 }
 
-func (r *SqlRepository) Add(player *model.Player) error {
+func (r *sqlitePlayerRepository) Init() error {
+	if err := r.OpenConnection(); err != nil {
+		return repository.NewErrRepositoryInitFailure(err.Error())
+	}
+
+	if err := r.CreateSchema(); err != nil {
+		return repository.NewErrRepositoryInitFailure(err.Error())
+	}
+
+	return nil
+}
+
+func (r *sqlitePlayerRepository) Add(player *model.Player) error {
 	// start db transaction
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -55,7 +81,7 @@ func (r *SqlRepository) Add(player *model.Player) error {
 	return nil
 }
 
-func (r *SqlRepository) GetList() ([]*model.Player, error) {
+func (r *sqlitePlayerRepository) GetList() ([]*model.Player, error) {
 	// fetch players to bid from db
 	rows, err := r.db.Query(`select * from players`)
 	if err != nil {
@@ -78,4 +104,8 @@ func (r *SqlRepository) GetList() ([]*model.Player, error) {
 	}
 
 	return players, nil
+}
+
+func (r *sqlitePlayerRepository) Close() {
+	r.db.Close()
 }

@@ -1,15 +1,16 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
 	"log"
 	"os"
 	"sokker-org-auto-bidder/internal/model"
-	"sokker-org-auto-bidder/internal/repository"
+	"sokker-org-auto-bidder/internal/repository/player"
 
 	_ "github.com/mattn/go-sqlite3"
 )
+
+var playerRepository player.PlayerRepository
 
 func main() {
 	// check subcommand is provided
@@ -17,19 +18,13 @@ func main() {
 		wrongSubcommand()
 	}
 
-	// init db connections
-	db, err := sql.Open("sqlite3", "./bidder.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	// ensure db tables structure created
-	r := repository.NewDbRepository(db)
-	if err := r.Init(); err != nil {
+	// create repository
+	playerRepository = player.NewSqlitePlayerRepository("./bidder.db")
+	if err := playerRepository.Init(); err != nil {
 		log.Print(err.Error())
 		return
 	}
+	defer playerRepository.Close()
 
 	// define 'add' subcommand flags set
 	addCmd := flag.NewFlagSet("add", flag.ExitOnError)
@@ -42,7 +37,7 @@ func main() {
 		log.Print("make bid for listed players:")
 
 		// get players to bid list
-		players, err := r.GetList()
+		players, err := playerRepository.GetList()
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(1)
@@ -73,7 +68,7 @@ func main() {
 		}
 
 		// save player into the DB
-		if err := r.Add(player); err != nil {
+		if err := playerRepository.Add(player); err != nil {
 			log.Fatal(err)
 		}
 
