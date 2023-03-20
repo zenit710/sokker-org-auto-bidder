@@ -40,17 +40,64 @@ func main() {
 	switch os.Args[1] {
 	case "bid":
 		fmt.Println("make bid for listed players")
+
+		// fetch players to bid from db
+		rows, err := db.Query(`select * from players`)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+
+		// print all players to bid
+		for rows.Next() {
+			var playerId int
+			var maxPrice int
+
+			err = rows.Scan(&playerId, &maxPrice)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			fmt.Println("playerId:", playerId, "maxPrice:", maxPrice)
+		}
 	case "add":
+		// parse cmd flags
 		addCmd.Parse(os.Args[2:])
 
+		// validate playerId
 		if *playerId <= 0 {
 			fmt.Println("playerId has to be greater than zero")
 			os.Exit(1)
 		}
 
+		// validate maxPrice
 		if *maxPrice <= 0 {
 			fmt.Println("maxPrice has to be greater than zero")
 			os.Exit(1)
+		}
+
+		// start db transaction
+		tx, err := db.Begin()
+		if err != nil {
+			log.Fatal(err)
+		}
+		// create player to bid insert statement
+		stmt, err := tx.Prepare("insert into players(playerId, maxPrice) values(?, ?)")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer stmt.Close()
+		
+		// set transaction values
+		_, err = stmt.Exec(*playerId, *maxPrice)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// commit db transaction
+		err = tx.Commit()
+		if err != nil {
+			log.Fatal(err)
 		}
 
 		fmt.Println("add player to bid list")
