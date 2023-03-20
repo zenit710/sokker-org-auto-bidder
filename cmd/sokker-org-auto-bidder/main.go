@@ -3,9 +3,10 @@ package main
 import (
 	"database/sql"
 	"flag"
-	"fmt"
 	"log"
 	"os"
+	"sokker-org-auto-bidder/internal/model"
+	"sokker-org-auto-bidder/internal/repository"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -24,10 +25,9 @@ func main() {
 	defer db.Close()
 
 	// ensure db tables structure created
-	sqlStmt := `create table if not exists players (playerId integer not null primary key, maxPrice integer not null);`
-	_, err = db.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
+	r := repository.NewDbRepository(db)
+	if err := r.Init(); err != nil {
+		log.Print(err.Error())
 		return
 	}
 
@@ -39,26 +39,18 @@ func main() {
 	// choose subcommand to run
 	switch os.Args[1] {
 	case "bid":
-		fmt.Println("make bid for listed players")
+		log.Print("make bid for listed players:")
 
-		// fetch players to bid from db
-		rows, err := db.Query(`select * from players`)
+		// get players to bid list
+		players, err := r.GetList()
 		if err != nil {
 			log.Fatal(err)
+			os.Exit(1)
 		}
-		defer rows.Close()
 
 		// print all players to bid
-		for rows.Next() {
-			var playerId int
-			var maxPrice int
-
-			err = rows.Scan(&playerId, &maxPrice)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			fmt.Println("playerId:", playerId, "maxPrice:", maxPrice)
+		for _, player := range players {
+			log.Printf("%v", player)
 		}
 	case "add":
 		// parse cmd flags
@@ -66,49 +58,31 @@ func main() {
 
 		// validate playerId
 		if *playerId <= 0 {
-			fmt.Println("playerId has to be greater than zero")
-			os.Exit(1)
+			log.Fatal("playerId has to be greater than zero")
 		}
 
 		// validate maxPrice
 		if *maxPrice <= 0 {
-			fmt.Println("maxPrice has to be greater than zero")
-			os.Exit(1)
+			log.Fatal("maxPrice has to be greater than zero")
 		}
 
-		// start db transaction
-		tx, err := db.Begin()
-		if err != nil {
-			log.Fatal(err)
+		// create player model
+		player := &model.Player{
+			Id: uint(*playerId),
+			MaxPrice: uint(*maxPrice),
 		}
-		// create player to bid insert statement
-		stmt, err := tx.Prepare("insert into players(playerId, maxPrice) values(?, ?)")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer stmt.Close()
-		
-		// set transaction values
-		_, err = stmt.Exec(*playerId, *maxPrice)
-		if err != nil {
+
+		// save player into the DB
+		if err := r.Add(player); err != nil {
 			log.Fatal(err)
 		}
 
-		// commit db transaction
-		err = tx.Commit()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		fmt.Println("add player to bid list")
-		fmt.Println("id:", *playerId)
-		fmt.Println("max price:", *maxPrice)
+		log.Printf("player added to bid list: %v", player)
 	default:
 		wrongSubcommand()
 	}
 }
 
 func wrongSubcommand() {
-	fmt.Println("expected 'bid' or 'add' subcommand")
-	os.Exit(1)
+	log.Fatal("expected 'bid' or 'add' subcommand")
 }
