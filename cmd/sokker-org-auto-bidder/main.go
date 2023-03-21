@@ -27,7 +27,10 @@ func main() {
 	// choose subcommand to run
 	switch os.Args[1] {
 	case "bid":
-		handleBidCommand()
+		bidCmd := subcommands.BidSubcommand{R: playerRepository, Args: args}
+		if err := bidCmd.Run(); err != nil {
+			log.Fatal(err)
+		}
 	case "add":
 		addCmd := subcommands.PlayerAddSubcommand{R: playerRepository, Args: args}
 		if err := addCmd.Run(); err != nil {
@@ -38,7 +41,6 @@ func main() {
 	}
 }
 
-
 func createPlayerRepository() player.PlayerRepository {
 	playerRepository := player.NewSqlitePlayerRepository("./bidder.db")
 	if err := playerRepository.Init(); err != nil {
@@ -46,22 +48,6 @@ func createPlayerRepository() player.PlayerRepository {
 	}
 
 	return playerRepository
-}
-
-func handleBidCommand() {
-	log.Print("make bid for listed players:")
-
-	// get players to bid list
-	players, err := playerRepository.GetList()
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
-	// print all players to bid
-	for _, player := range players {
-		log.Printf("%v", player)
-	}
 }
 
 func wrongSubcommand() {
