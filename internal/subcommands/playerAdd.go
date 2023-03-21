@@ -11,17 +11,16 @@ var _ Subcommand = &PlayerAddSubcommand{}
 
 type PlayerAddSubcommand struct {
 	R player.PlayerRepository
-	Args []string
 }
 
-func (s *PlayerAddSubcommand) Run() error {
+func (s *PlayerAddSubcommand) Run(args []string) error {
 	// define 'add' subcommand flags set
 	addCmd := flag.NewFlagSet("add", flag.ExitOnError)
 	playerId := addCmd.Uint("playerId", 0, "Player ID")
 	maxPrice := addCmd.Uint("maxPrice", 0, "Maxium price for player to bid")
 
 	// parse cmd flags
-	addCmd.Parse(s.Args)
+	addCmd.Parse(args)
 
 	// create player model
 	player := &model.Player{

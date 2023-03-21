@@ -1,5 +1,5 @@
 package subcommands
 
 type Subcommand interface {
-	Run() error
+	Run(args []string) error
 }

@@ -9,10 +9,9 @@ var _ Subcommand = &BidSubcommand{}
 
 type BidSubcommand struct {
 	R player.PlayerRepository
-	Args []string
 }
 
-func (s *BidSubcommand) Run() error {
+func (s *BidSubcommand) Run(args []string) error {
 	log.Print("make bid for listed players:")
 
 	// get players to bid list

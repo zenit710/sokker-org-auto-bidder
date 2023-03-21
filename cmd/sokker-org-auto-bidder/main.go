@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 	"sokker-org-auto-bidder/internal/repository/player"
@@ -12,32 +13,30 @@ import (
 var playerRepository player.PlayerRepository
 
 func main() {
-	// check subcommand is provided
-	if len(os.Args) < 2 {
-		wrongSubcommand()
-	}
-
-	// handle repository
+	// create player repository
 	playerRepository = createPlayerRepository()
 	defer playerRepository.Close()
 
+	// create subcommand registry
+	subCmdRegistry := subcommands.NewSubcommandRegistry()
+	subCmdRegistry.Register("bid", &subcommands.BidSubcommand{R: playerRepository})
+	subCmdRegistry.Register("add", &subcommands.PlayerAddSubcommand{R: playerRepository})
+
+	flag.Parse()
+
+	// check subcommand provided
+	if len(os.Args) < 2 {
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
 	// get subcommand args
+	subcommand := os.Args[1]
 	args := os.Args[2:]
 
-	// choose subcommand to run
-	switch os.Args[1] {
-	case "bid":
-		bidCmd := subcommands.BidSubcommand{R: playerRepository, Args: args}
-		if err := bidCmd.Run(); err != nil {
-			log.Fatal(err)
-		}
-	case "add":
-		addCmd := subcommands.PlayerAddSubcommand{R: playerRepository, Args: args}
-		if err := addCmd.Run(); err != nil {
-			log.Fatal(err)
-		}
-	default:
-		wrongSubcommand()
+	// handle subcommand
+	if err := subCmdRegistry.Run(subcommand, args); err != nil {
+		log.Fatal(err)
 	}
 }
 
@@ -48,8 +47,4 @@ func createPlayerRepository() player.PlayerRepository {
 	}
 
 	return playerRepository
-}
-
-func wrongSubcommand() {
-	log.Fatal("expected 'bid' or 'add' subcommand")
 }
