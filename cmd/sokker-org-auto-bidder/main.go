@@ -19,8 +19,8 @@ func main() {
 
 	// create subcommand registry
 	subCmdRegistry := subcommands.NewSubcommandRegistry()
-	subCmdRegistry.Register("bid", &subcommands.BidSubcommand{R: playerRepository})
-	subCmdRegistry.Register("add", &subcommands.PlayerAddSubcommand{R: playerRepository})
+	subCmdRegistry.Register("bid", subcommands.NewBidSubcommand(playerRepository))
+	subCmdRegistry.Register("add", subcommands.NewPlayerAddSubcommand(playerRepository))
 
 	flag.Parse()
 

@@ -1,21 +1,31 @@
 package subcommands
 
 import (
+	"flag"
 	"log"
 	"sokker-org-auto-bidder/internal/repository/player"
 )
 
-var _ Subcommand = &BidSubcommand{}
+var _ Subcommand = &bidSubcommand{}
 
-type BidSubcommand struct {
-	R player.PlayerRepository
+type bidSubcommand struct {
+	r player.PlayerRepository
+	fs *flag.FlagSet
 }
 
-func (s *BidSubcommand) Run(args []string) error {
+func NewBidSubcommand(r player.PlayerRepository) *bidSubcommand {
+	return &bidSubcommand{r: r}
+}
+
+func (s *bidSubcommand) Init(args []string) error {
+	return nil
+}
+
+func (s *bidSubcommand) Run() error {
 	log.Print("make bid for listed players:")
 
 	// get players to bid list
-	players, err := s.R.GetList()
+	players, err := s.r.GetList()
 	if err != nil {
 		return err
 	}

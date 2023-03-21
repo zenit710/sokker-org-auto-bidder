@@ -7,25 +7,37 @@ import (
 	"sokker-org-auto-bidder/internal/repository/player"
 )
 
-var _ Subcommand = &PlayerAddSubcommand{}
+var _ Subcommand = &playerAddSubcommand{}
 
-type PlayerAddSubcommand struct {
-	R player.PlayerRepository
+type playerAddSubcommand struct {
+	r player.PlayerRepository
+	fs *flag.FlagSet
+
+	playerId uint
+	maxPrice uint
 }
 
-func (s *PlayerAddSubcommand) Run(args []string) error {
-	// define 'add' subcommand flags set
-	addCmd := flag.NewFlagSet("add", flag.ExitOnError)
-	playerId := addCmd.Uint("playerId", 0, "Player ID")
-	maxPrice := addCmd.Uint("maxPrice", 0, "Maxium price for player to bid")
+func NewPlayerAddSubcommand(r player.PlayerRepository) *playerAddSubcommand {
+	cmd := &playerAddSubcommand{
+		r: r,
+		fs: flag.NewFlagSet("add", flag.ExitOnError),
+	}
 
-	// parse cmd flags
-	addCmd.Parse(args)
+	cmd.fs.UintVar(&cmd.playerId, "playerId", 0, "Player ID")
+	cmd.fs.UintVar(&cmd.maxPrice, "maxPrice", 0, "Maxium price for player to bid")
 
+	return cmd
+}
+
+func (s *playerAddSubcommand) Init(args []string) error {
+	return s.fs.Parse(args)
+}
+
+func (s *playerAddSubcommand) Run() error {
 	// create player model
 	player := &model.Player{
-		Id: uint(*playerId),
-		MaxPrice: uint(*maxPrice),
+		Id: s.playerId,
+		MaxPrice: s.maxPrice,
 	}
 
 	// validate player model
@@ -34,7 +46,7 @@ func (s *PlayerAddSubcommand) Run(args []string) error {
 	}
 
 	// save player into the DB
-	if err := s.R.Add(player); err != nil {
+	if err := s.r.Add(player); err != nil {
 		return err
 	}
 

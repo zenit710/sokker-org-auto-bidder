@@ -22,7 +22,11 @@ func (s *subcommandRegistry) Run(name string, args []string) error {
 		return &ErrSubcommandNotAvailable{Name: name, Available: s.GetSubcommandNames()}
 	}
 	
-	return cmd.Run(args)
+	if err := cmd.Init(args); err != nil {
+		return err
+	}
+
+	return cmd.Run()
 }
 
 func (s *subcommandRegistry) GetSubcommandNames() []string {

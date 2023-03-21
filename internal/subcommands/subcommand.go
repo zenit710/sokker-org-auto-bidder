@@ -1,5 +1,6 @@
 package subcommands
 
 type Subcommand interface {
-	Run(args []string) error
+	Init(args []string) error
+	Run() error
 }
