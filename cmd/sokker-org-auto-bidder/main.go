@@ -1,11 +1,10 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"os"
-	"sokker-org-auto-bidder/internal/model"
 	"sokker-org-auto-bidder/internal/repository/player"
+	"sokker-org-auto-bidder/internal/subcommands"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -18,15 +17,22 @@ func main() {
 		wrongSubcommand()
 	}
 
+	// handle repository
 	playerRepository = createPlayerRepository()
 	defer playerRepository.Close()
+
+	// get subcommand args
+	args := os.Args[2:]
 
 	// choose subcommand to run
 	switch os.Args[1] {
 	case "bid":
 		handleBidCommand()
 	case "add":
-		handleAddCommand()
+		addCmd := subcommands.PlayerAddSubcommand{R: playerRepository, Args: args}
+		if err := addCmd.Run(); err != nil {
+			log.Fatal(err)
+		}
 	default:
 		wrongSubcommand()
 	}
@@ -40,39 +46,6 @@ func createPlayerRepository() player.PlayerRepository {
 	}
 
 	return playerRepository
-}
-
-func handleAddCommand() {
-	// define 'add' subcommand flags set
-	addCmd := flag.NewFlagSet("add", flag.ExitOnError)
-	playerId := addCmd.Int("playerId", 0, "Player ID")
-	maxPrice := addCmd.Int("maxPrice", 0, "Maxium price for player to bid")
-
-	// parse cmd flags
-	addCmd.Parse(os.Args[2:])
-
-	// validate playerId
-	if *playerId <= 0 {
-		log.Fatal("playerId has to be greater than zero")
-	}
-
-	// validate maxPrice
-	if *maxPrice <= 0 {
-		log.Fatal("maxPrice has to be greater than zero")
-	}
-
-	// create player model
-	player := &model.Player{
-		Id: uint(*playerId),
-		MaxPrice: uint(*maxPrice),
-	}
-
-	// save player into the DB
-	if err := playerRepository.Add(player); err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf("player added to bid list: %v", player)
 }
 
 func handleBidCommand() {
