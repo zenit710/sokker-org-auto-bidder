@@ -1,7 +1,7 @@
 package main
 
 import (
-	"flag"
+	"fmt"
 	"log"
 	"os"
 	"sokker-org-auto-bidder/internal/repository/player"
@@ -22,11 +22,9 @@ func main() {
 	subCmdRegistry.Register("bid", subcommands.NewBidSubcommand(playerRepository))
 	subCmdRegistry.Register("add", subcommands.NewPlayerAddSubcommand(playerRepository))
 
-	flag.Parse()
-
 	// check subcommand provided
 	if len(os.Args) < 2 {
-		flag.PrintDefaults()
+		fmt.Printf("No subcommand provided. Try one of %v\n", subCmdRegistry.GetSubcommandNames())
 		os.Exit(1)
 	}
 
