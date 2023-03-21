@@ -1,7 +1,6 @@
 package subcommands
 
 import (
-	"flag"
 	"log"
 	"sokker-org-auto-bidder/internal/repository/player"
 )
@@ -10,7 +9,6 @@ var _ Subcommand = &bidSubcommand{}
 
 type bidSubcommand struct {
 	r player.PlayerRepository
-	fs *flag.FlagSet
 }
 
 func NewBidSubcommand(r player.PlayerRepository) *bidSubcommand {
