@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"sokker-org-auto-bidder/tools"
@@ -24,7 +25,11 @@ func NewHttpClient(user, pass string) *httpClient {
 }
 
 func (s *httpClient) Auth() error {
-	jsonBody := []byte(fmt.Sprintf(`{"login":"%s", "password":"%s"}`, s.user, s.pass))
+	body := &loginReqBody{Login: s.user, Pass: s.pass}
+	jsonBody, err := json.Marshal(body)
+    if err != nil {
+        return err
+    }
 	bodyReader := bytes.NewReader(jsonBody)
 
 	res, err := http.Post(AUTH_URL, "application/json", bodyReader)
