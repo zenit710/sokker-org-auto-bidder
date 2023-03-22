@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"sokker-org-auto-bidder/internal/repository/player"
 	"sokker-org-auto-bidder/internal/subcommands"
@@ -22,8 +21,7 @@ func main() {
 
 	// check subcommand provided
 	if len(os.Args) < 2 {
-		fmt.Printf("No subcommand provided. Try one of %v\n", subCmdRegistry.GetSubcommandNames())
-		os.Exit(1)
+		logError(fmt.Sprintf("No subcommand provided. Try one of %v", subCmdRegistry.GetSubcommandNames()))
 	}
 
 	// get subcommand args
@@ -32,15 +30,20 @@ func main() {
 
 	// handle subcommand
 	if err := subCmdRegistry.Run(subcommand, args); err != nil {
-		log.Fatal(err)
+		logError(err.Error())
 	}
 }
 
 func createPlayerRepository() player.PlayerRepository {
 	playerRepository := player.NewSqlitePlayerRepository("./bidder.db")
 	if err := playerRepository.Init(); err != nil {
-		log.Fatal(err.Error())
+		logError(err.Error())
 	}
 
 	return playerRepository
+}
+
+func logError(msg string) {
+	fmt.Println(msg)
+	os.Exit(1)
 }
