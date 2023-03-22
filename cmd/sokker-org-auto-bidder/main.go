@@ -3,21 +3,24 @@ package main
 import (
 	"fmt"
 	"os"
+	"sokker-org-auto-bidder/internal/client"
 	"sokker-org-auto-bidder/internal/repository/player"
 	"sokker-org-auto-bidder/internal/subcommands"
 )
 
-var playerRepository player.PlayerRepository
-
 func main() {
+	// create client
+	var client client.Client = client.NewHttpClient(os.Getenv("SOKKER_USER"), os.Getenv("SOKKER_PASS"))
+
 	// create player repository
-	playerRepository = createPlayerRepository()
+	playerRepository := createPlayerRepository()
 	defer playerRepository.Close()
 
 	// create subcommand registry
 	subCmdRegistry := subcommands.NewSubcommandRegistry()
 	subCmdRegistry.Register("bid", subcommands.NewBidSubcommand(playerRepository))
 	subCmdRegistry.Register("add", subcommands.NewPlayerAddSubcommand(playerRepository))
+	subCmdRegistry.Register("check-auth", subcommands.NewCheckAuthSubcommand(client))
 
 	// check subcommand provided
 	if len(os.Args) < 2 {
