@@ -1,6 +1,9 @@
 package subcommands
 
-import "sokker-org-auto-bidder/internal/client"
+import (
+	"fmt"
+	"sokker-org-auto-bidder/internal/client"
+)
 
 var _ Subcommand = &checkAuthSubcommand{}
 
@@ -20,6 +23,8 @@ func (s *checkAuthSubcommand) Run() error {
 	if err := s.c.Auth(); err != nil {
 		return err
 	}
+
+	fmt.Println("Auth success!")
 	
 	return nil
 }
