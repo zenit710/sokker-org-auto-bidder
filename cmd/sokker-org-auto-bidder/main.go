@@ -6,8 +6,6 @@ import (
 	"os"
 	"sokker-org-auto-bidder/internal/repository/player"
 	"sokker-org-auto-bidder/internal/subcommands"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 var playerRepository player.PlayerRepository
