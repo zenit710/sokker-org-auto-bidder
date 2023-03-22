@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"sokker-org-auto-bidder/tools"
 )
@@ -38,7 +37,7 @@ func (s *httpClient) Auth() error {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("could not authorize")
+		return ErrBadCredentials
 	}
 
 	return nil
