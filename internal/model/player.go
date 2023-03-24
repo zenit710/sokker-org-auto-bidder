@@ -3,6 +3,7 @@ package model
 type Player struct {
 	Id uint
 	MaxPrice uint
+	Deadline string
 }
 
 func (p *Player) Validate() error {

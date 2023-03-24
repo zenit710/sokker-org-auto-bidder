@@ -31,10 +31,14 @@ func (r *sqlitePlayerRepository) OpenConnection() error {
 }
 
 func (r *sqlitePlayerRepository) CreateSchema() error {
-	sqlStmt := `create table if not exists players (playerId integer not null primary key, maxPrice integer not null);`
+	sqlStmt := `create table if not exists players (
+		playerId integer not null primary key,
+		maxPrice integer not null,
+		deadline text not null
+		);`
 
 	if _, err := r.db.Exec(sqlStmt); err != nil {
-		return repository.NewErrRepositoryInitFailure(fmt.Sprintf("%q: %s", err.Error(), sqlStmt))	
+		return repository.NewErrRepositoryInitFailure(fmt.Sprintf("%q: %s", err.Error(), sqlStmt))
 	}
 
 	return nil
@@ -60,14 +64,14 @@ func (r *sqlitePlayerRepository) Add(player *model.Player) error {
 	}
 
 	// create player to bid insert statement
-	stmt, err := tx.Prepare("insert into players(playerId, maxPrice) values(?, ?)")
+	stmt, err := tx.Prepare(`insert into players (playerId, maxPrice, deadline) values(?, ?, datetime(?))`)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 	
 	// set transaction values
-	_, err = stmt.Exec(player.Id, player.MaxPrice)
+	_, err = stmt.Exec(player.Id, player.MaxPrice, player.Deadline)
 	if err != nil {
 		return err
 	}
@@ -95,7 +99,7 @@ func (r *sqlitePlayerRepository) GetList() ([]*model.Player, error) {
 	for rows.Next() {
 		player := &model.Player{}
 
-		err = rows.Scan(&player.Id, &player.MaxPrice)
+		err = rows.Scan(&player.Id, &player.MaxPrice, &player.Deadline)
 		if err != nil {
 			return nil, err
 		}

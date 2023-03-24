@@ -38,6 +38,7 @@ func (s *playerAddSubcommand) Run() error {
 	player := &model.Player{
 		Id: s.playerId,
 		MaxPrice: s.maxPrice,
+		Deadline: "2023-03-22 01:35:25.000000",
 	}
 
 	// validate player model
