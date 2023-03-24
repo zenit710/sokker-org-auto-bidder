@@ -71,4 +71,4 @@ You can build app after changes using `make`. `soab` executable will be built in
 - fetch more player info while adding player
 - do not generate new phpsessid everytime, store it for some time
 - add doc comments
-- auth is mandatory - maybe we should check in main? (check-auth subcmd to the trash)
+- respect timezone from transfer.deadline.timezone when saving/retrieving players to bid
