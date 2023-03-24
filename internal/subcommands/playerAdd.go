@@ -2,7 +2,9 @@ package subcommands
 
 import (
 	"flag"
+	"fmt"
 	"log"
+	"sokker-org-auto-bidder/internal/client"
 	"sokker-org-auto-bidder/internal/model"
 	"sokker-org-auto-bidder/internal/repository/player"
 )
@@ -10,6 +12,7 @@ import (
 var _ Subcommand = &playerAddSubcommand{}
 
 type playerAddSubcommand struct {
+	c client.Client
 	r player.PlayerRepository
 	fs *flag.FlagSet
 
@@ -17,8 +20,9 @@ type playerAddSubcommand struct {
 	maxPrice uint
 }
 
-func NewPlayerAddSubcommand(r player.PlayerRepository) *playerAddSubcommand {
+func NewPlayerAddSubcommand(r player.PlayerRepository, c client.Client) *playerAddSubcommand {
 	cmd := &playerAddSubcommand{
+		c: c,
 		r: r,
 		fs: flag.NewFlagSet("add", flag.ExitOnError),
 	}
@@ -34,11 +38,20 @@ func (s *playerAddSubcommand) Init(args []string) error {
 }
 
 func (s *playerAddSubcommand) Run() error {
+	info, err := s.c.FetchPlayerInfo(s.playerId)
+	if err != nil {
+		return err
+	}
+
+	if s.maxPrice < info.Transfer.Price.MinBid.Value {
+		return fmt.Errorf("minimum price for this player is %d", info.Transfer.Price.MinBid.Value)
+	}
+
 	// create player model
 	player := &model.Player{
 		Id: s.playerId,
 		MaxPrice: s.maxPrice,
-		Deadline: "2023-03-22 01:35:25.000000",
+		Deadline: info.Transfer.Deadline.Date,
 	}
 
 	// validate player model
