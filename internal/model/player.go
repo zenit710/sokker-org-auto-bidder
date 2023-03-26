@@ -1,9 +1,11 @@
 package model
 
+import "time"
+
 type Player struct {
 	Id uint
 	MaxPrice uint
-	Deadline string
+	Deadline time.Time
 }
 
 func (p *Player) Validate() error {

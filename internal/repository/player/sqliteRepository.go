@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"sokker-org-auto-bidder/internal/model"
 	"sokker-org-auto-bidder/internal/repository"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
+
+const timeLayout = "2006-01-02 15:04:05"
 
 var _ PlayerRepository = &sqlitePlayerRepository{}
 
@@ -71,7 +74,7 @@ func (r *sqlitePlayerRepository) Add(player *model.Player) error {
 	defer stmt.Close()
 	
 	// set transaction values
-	_, err = stmt.Exec(player.Id, player.MaxPrice, player.Deadline)
+	_, err = stmt.Exec(player.Id, player.MaxPrice, player.Deadline.Format(time.RFC3339))
 	if err != nil {
 		return err
 	}
@@ -87,7 +90,7 @@ func (r *sqlitePlayerRepository) Add(player *model.Player) error {
 
 func (r *sqlitePlayerRepository) GetList() ([]*model.Player, error) {
 	// fetch players to bid from db
-	rows, err := r.db.Query(`select * from players`)
+	rows, err := r.db.Query(`select * from players where deadline > datetime("now")`)
 	if err != nil {
 		return nil, err
 	}
@@ -98,12 +101,19 @@ func (r *sqlitePlayerRepository) GetList() ([]*model.Player, error) {
 	// convert db rows to player model
 	for rows.Next() {
 		player := &model.Player{}
+		var dt string
 
-		err = rows.Scan(&player.Id, &player.MaxPrice, &player.Deadline)
+		err = rows.Scan(&player.Id, &player.MaxPrice, &dt)
 		if err != nil {
 			return nil, err
 		}
 
+		deadline, err := time.Parse(timeLayout, dt)
+		if err != nil {
+			return nil, err
+		}
+
+		player.Deadline = deadline
 		players = append(players, player)
 	}
 

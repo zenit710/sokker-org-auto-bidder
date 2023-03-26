@@ -7,6 +7,8 @@ import (
 	"sokker-org-auto-bidder/internal/client"
 	"sokker-org-auto-bidder/internal/model"
 	"sokker-org-auto-bidder/internal/repository/player"
+	"sokker-org-auto-bidder/tools"
+	"time"
 )
 
 var _ Subcommand = &playerAddSubcommand{}
@@ -43,15 +45,22 @@ func (s *playerAddSubcommand) Run() error {
 		return err
 	}
 
+	// check can be any bid made
 	if s.maxPrice < info.Transfer.Price.MinBid.Value {
 		return fmt.Errorf("minimum price for this player is %d", info.Transfer.Price.MinBid.Value)
+	}
+
+	// get transfer deadline time including timezone
+	dt, err := tools.TimeInZone(client.TimeLayout, info.Transfer.Deadline.Date, info.Transfer.Deadline.Timezone)
+	if err != nil {
+		return err
 	}
 
 	// create player model
 	player := &model.Player{
 		Id: s.playerId,
 		MaxPrice: s.maxPrice,
-		Deadline: info.Transfer.Deadline.Date,
+		Deadline: dt.In(time.UTC),
 	}
 
 	// validate player model
