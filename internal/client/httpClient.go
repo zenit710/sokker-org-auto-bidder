@@ -20,13 +20,15 @@ type httpClient struct {
 	user string
 	pass string
 	sessId string
+	auth bool
 }
 
 func NewHttpClient(user, pass string) *httpClient {
-	return &httpClient{user: user, pass: pass, sessId: tools.String(26)}
+	return &httpClient{user: user, pass: pass, auth: false, sessId: tools.String(26)}
 }
 
 func (s *httpClient) Auth() error {
+	// prepare auth request body
 	body := &loginReqBody{Login: s.user, Pass: s.pass}
 	jsonBody, err := json.Marshal(body)
     if err != nil {
@@ -34,7 +36,17 @@ func (s *httpClient) Auth() error {
     }
 	bodyReader := bytes.NewReader(jsonBody)
 
-	res, err := http.Post(urlAuth, "application/json", bodyReader)
+	// prepare auth request
+	req, err := http.NewRequest(http.MethodPost, urlAuth, bodyReader)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("content-type", "application/json")
+	req.Header.Set("cookie", fmt.Sprintf("PHPSESSID=%s", s.sessId))
+
+	// // make http request
+	res, err := http.DefaultClient.Do(req)
+
 	if err != nil {
 		return err
 	}
@@ -42,6 +54,8 @@ func (s *httpClient) Auth() error {
 	if res.StatusCode != http.StatusOK {
 		return ErrBadCredentials
 	}
+
+	s.auth = true
 
 	return nil
 }
