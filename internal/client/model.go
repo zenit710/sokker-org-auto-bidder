@@ -26,9 +26,16 @@ type playerInfoResponse struct {
 		Price struct {
 			MinBid bidState
 		}
+		BuyerId uint
 	}
 }
 
 type bidState struct {
 	Value uint
+}
+
+type clubInfoResponse struct {
+	Team struct {
+		Id uint
+	}
 }

@@ -53,17 +53,25 @@ func (s *bidSubcommand) handlePlayer(p *model.Player) error {
 	}
 
 	if info.Transfer.Price.MinBid.Value > p.MaxPrice {
+		// @TODO: delete player from DB
 		return errors.New("max price reached, cannot bid further")
 	}
 
-	if err = s.c.Auth(); err != nil {
+	club, err := s.c.Auth()
+	if err != nil {
 		return fmt.Errorf("authorization error")
+	}
+
+	if info.Transfer.BuyerId == club.Team.Id {
+		return errors.New("you are current leader, no reason to bid")
 	}
 
 	_, err = s.c.Bid(p.Id, info.Transfer.Price.MinBid.Value)
 	if err != nil {
 		return fmt.Errorf("bid could not be made: %v", err)
 	}
+
+	// @TODO update deadline in DB
 
 	return nil
 }

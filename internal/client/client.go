@@ -1,7 +1,8 @@
 package client
 
 type Client interface {
-	Auth() error
-	FetchPlayerInfo(id uint) (*playerInfoResponse, error)
+	Auth() (*clubInfoResponse, error)
 	Bid(id, price uint) (*playerInfoResponse, error)
+	ClubInfo() (*clubInfoResponse, error)
+	FetchPlayerInfo(id uint) (*playerInfoResponse, error)
 }

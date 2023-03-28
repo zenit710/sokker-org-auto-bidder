@@ -20,11 +20,12 @@ func (s *checkAuthSubcommand) Init(args []string) error {
 }
 
 func (s *checkAuthSubcommand) Run() error {
-	if err := s.c.Auth(); err != nil {
+	club, err := s.c.Auth()
+	if err != nil {
 		return err
 	}
 
-	fmt.Println("Auth success!")
+	fmt.Printf("Auth success! Club ID: %d\n", club.Team.Id)
 	
 	return nil
 }
