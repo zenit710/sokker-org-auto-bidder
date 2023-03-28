@@ -18,7 +18,7 @@ func main() {
 
 	// create subcommand registry
 	subCmdRegistry := subcommands.NewSubcommandRegistry()
-	subCmdRegistry.Register("bid", subcommands.NewBidSubcommand(playerRepository))
+	subCmdRegistry.Register("bid", subcommands.NewBidSubcommand(playerRepository, client))
 	subCmdRegistry.Register("add", subcommands.NewPlayerAddSubcommand(playerRepository, client))
 	subCmdRegistry.Register("check-auth", subcommands.NewCheckAuthSubcommand(client))
 
