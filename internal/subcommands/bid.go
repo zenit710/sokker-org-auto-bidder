@@ -57,7 +57,8 @@ func (s *bidSubcommand) handlePlayer(p *model.Player) error {
 
 	// check can bid furhter
 	if info.Transfer.Price.MinBid.Value > p.MaxPrice {
-		// @TODO: delete player from DB
+		err = s.r.Delete(p)
+		fmt.Printf("player did not remove from bid list: %v", err)
 		return errors.New("max price reached, cannot bid further")
 	}
 
