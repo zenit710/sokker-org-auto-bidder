@@ -88,7 +88,7 @@ func (r *sqlitePlayerRepository) Add(player *model.Player) error {
 	return nil
 }
 
-func (r *sqlitePlayerRepository) GetList() ([]*model.Player, error) {
+func (r *sqlitePlayerRepository) List() ([]*model.Player, error) {
 	// fetch players to bid from db
 	rows, err := r.db.Query(`select * from players where deadline > datetime("now")`)
 	if err != nil {
@@ -118,6 +118,35 @@ func (r *sqlitePlayerRepository) GetList() ([]*model.Player, error) {
 	}
 
 	return players, nil
+}
+
+func (r *sqlitePlayerRepository) Update(player *model.Player) error {
+	// start db transaction
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	// create player to bid insert statement
+	stmt, err := tx.Prepare(`update players set maxPrice = ?, deadline = datetime(?) where playerId = ?`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	
+	// set transaction values
+	_, err = stmt.Exec(player.MaxPrice, player.Deadline.Format(time.RFC3339), player.Id)
+	if err != nil {
+		return err
+	}
+
+	// commit db transaction
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *sqlitePlayerRepository) Close() {

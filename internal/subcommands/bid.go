@@ -7,6 +7,8 @@ import (
 	"sokker-org-auto-bidder/internal/client"
 	"sokker-org-auto-bidder/internal/model"
 	"sokker-org-auto-bidder/internal/repository/player"
+	"sokker-org-auto-bidder/tools"
+	"time"
 )
 
 var _ Subcommand = &bidSubcommand{}
@@ -28,7 +30,7 @@ func (s *bidSubcommand) Run() error {
 	log.Print("make bid for listed players:")
 
 	// get players to bid list
-	players, err := s.r.GetList()
+	players, err := s.r.List()
 	if err != nil {
 		return err
 	}
@@ -47,31 +49,46 @@ func (s *bidSubcommand) Run() error {
 func (s *bidSubcommand) handlePlayer(p *model.Player) error {
 	log.Printf("%v", p)
 
+	// fetch player info
 	info, err := s.c.FetchPlayerInfo(p.Id)
 	if err != nil {
 		return err
 	}
 
+	// check can bid furhter
 	if info.Transfer.Price.MinBid.Value > p.MaxPrice {
 		// @TODO: delete player from DB
 		return errors.New("max price reached, cannot bid further")
 	}
 
+	// auth
 	club, err := s.c.Auth()
 	if err != nil {
 		return fmt.Errorf("authorization error")
 	}
 
+	// check current leader
 	if info.Transfer.BuyerId == club.Team.Id {
 		return errors.New("you are current leader, no reason to bid")
 	}
 
-	_, err = s.c.Bid(p.Id, info.Transfer.Price.MinBid.Value)
+	// bid player
+	info, err = s.c.Bid(p.Id, info.Transfer.Price.MinBid.Value)
 	if err != nil {
 		return fmt.Errorf("bid could not be made: %v", err)
 	}
 
-	// @TODO update deadline in DB
+	// check transfer deadline changed
+	newDeadline, err := tools.TimeInZone(client.TimeLayout, info.Transfer.Deadline.Date, info.Transfer.Deadline.Timezone)
+	if err != nil {
+		return err
+	}
+
+	// update player entry with new deadline
+	if p.Deadline.Before(newDeadline) {
+		p.Deadline = newDeadline.In(time.UTC)
+		s.r.Update(p)
+	}
 
 	return nil
 }

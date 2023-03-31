@@ -68,10 +68,9 @@ You can build app after changes using `make`. `soab` executable will be built in
 - print meaningful messages insted of db/http errors for example
 - log debug/info/warning/errors to the file
 - write unit tests
-- fetch more player info while adding player
 - do not generate new phpsessid everytime, store it for some time
 - add doc comments
 - bid subcommand:
-  - update deadline in db when needed
+  - TEST FOR update deadline in db when needed
   - delete player from db if cannot bid further
   - handle no funds for bid
