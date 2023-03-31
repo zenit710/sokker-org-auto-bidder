@@ -6,16 +6,19 @@ type subcommandRegistry struct {
 	m map[string]Subcommand
 }
 
+// NewSubcommandRegistry returns new empty registry for subcommands managment
 func NewSubcommandRegistry() *subcommandRegistry {
 	r := &subcommandRegistry{}
 	r.m = make(map[string]Subcommand)
 	return r
 }
 
+// Register adds subcommand to the registry on the name key
 func (s *subcommandRegistry) Register(name string, cmd Subcommand) {
 	s.m[name] = cmd
 }
 
+// Run executes subcommand registered on name key with provided args
 func (s *subcommandRegistry) Run(name string, args []string) error {
 	cmd := s.m[name]
 	if cmd == nil {
@@ -29,6 +32,7 @@ func (s *subcommandRegistry) Run(name string, args []string) error {
 	return cmd.Run()
 }
 
+// GetSubcommandNames returns key names of all registered subcommands
 func (s *subcommandRegistry) GetSubcommandNames() []string {
 	names := make([]string, len(s.m))
 
@@ -41,6 +45,7 @@ func (s *subcommandRegistry) GetSubcommandNames() []string {
 	return names
 }
 
+// ErrSubcommandNotAvailable is raised when registry has no subcommand registere on provided name key
 type ErrSubcommandNotAvailable struct {
 	Name string
 	Available []string
