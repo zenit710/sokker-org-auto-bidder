@@ -85,7 +85,7 @@ func (s *httpClient) FetchPlayerInfo(id uint) (*playerInfoResponse ,error) {
 	return p, nil
 }
 
-func (s *httpClient) Bid(id, price uint) (*playerInfoResponse, error) {
+func (s *httpClient) Bid(id, price uint) (*transferInfoResponse, error) {
 	// prepare req params
 	body := &bidReqBody{Value: price}
 	bidUrl := fmt.Sprintf(urlPlayerBidFormat, id)
@@ -101,7 +101,7 @@ func (s *httpClient) Bid(id, price uint) (*playerInfoResponse, error) {
 		return nil, fmt.Errorf("response status code: %d", res.StatusCode)
 	}
 
-	p := &playerInfoResponse{}
+	p := &transferInfoResponse{}
 	err = extractResponseObject(res, p)
 	if err != nil {
 		return nil, err

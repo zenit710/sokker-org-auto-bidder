@@ -35,9 +35,15 @@ func (s *bidSubcommand) Run() error {
 		return err
 	}
 
+	// auth
+	club, err := s.c.Auth()
+	if err != nil {
+		return fmt.Errorf("authorization error")
+	}
+
 	// bid players
 	for _, player := range players {
-		err := s.handlePlayer(player)
+		err := s.handlePlayer(player, club.Team.Id)
 		if err != nil {
 			fmt.Printf("(%d): %v\n", player.Id, err)
 		}
@@ -46,7 +52,7 @@ func (s *bidSubcommand) Run() error {
 	return nil
 }
 
-func (s *bidSubcommand) handlePlayer(p *model.Player) error {
+func (s *bidSubcommand) handlePlayer(p *model.Player, clubId uint) error {
 	log.Printf("%v", p)
 
 	// fetch player info
@@ -62,25 +68,19 @@ func (s *bidSubcommand) handlePlayer(p *model.Player) error {
 		return errors.New("max price reached, cannot bid further")
 	}
 
-	// auth
-	club, err := s.c.Auth()
-	if err != nil {
-		return fmt.Errorf("authorization error")
-	}
-
 	// check current leader
-	if info.Transfer.BuyerId == club.Team.Id {
+	if info.Transfer.BuyerId == clubId {
 		return errors.New("you are current leader, no reason to bid")
 	}
 
 	// bid player
-	info, err = s.c.Bid(p.Id, info.Transfer.Price.MinBid.Value)
+	tr, err := s.c.Bid(p.Id, info.Transfer.Price.MinBid.Value)
 	if err != nil {
 		return fmt.Errorf("bid could not be made: %v", err)
 	}
 
 	// check transfer deadline changed
-	newDeadline, err := tools.TimeInZone(client.TimeLayout, info.Transfer.Deadline.Date, info.Transfer.Deadline.Timezone)
+	newDeadline, err := tools.TimeInZone(client.TimeLayout, tr.Deadline.Date.Date, tr.Deadline.Date.Timezone)
 	if err != nil {
 		return err
 	}

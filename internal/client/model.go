@@ -14,8 +14,11 @@ type bidReqBody struct {
 	Value uint `json:"value"`
 }
 
-
 // response models
+
+type bidState struct {
+	Value uint
+}
 
 type playerInfoResponse struct {
 	Transfer struct {
@@ -30,8 +33,19 @@ type playerInfoResponse struct {
 	}
 }
 
-type bidState struct {
-	Value uint
+type transferInfoResponse struct {
+	Deadline struct {
+		Date struct {
+			Date string
+			Timezone string
+		}
+	}
+	Price struct {
+		MinBid bidState
+	}
+	Buyer struct {
+		Id uint
+	}
 }
 
 type clubInfoResponse struct {
