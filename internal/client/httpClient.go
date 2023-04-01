@@ -27,6 +27,7 @@ type httpClient struct {
 	auth bool
 }
 
+// NewHttpClient returns new HttpClient for sokker.org
 func NewHttpClient(user, pass string) *httpClient {
 	return &httpClient{user: user, pass: pass, auth: false, sessId: tools.String(26)}
 }

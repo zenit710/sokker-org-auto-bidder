@@ -22,6 +22,7 @@ type playerAddSubcommand struct {
 	maxPrice uint
 }
 
+// NewPlayerAddSubcommand returns new subcommand for adding players to the DB
 func NewPlayerAddSubcommand(r player.PlayerRepository, c client.Client) *playerAddSubcommand {
 	cmd := &playerAddSubcommand{
 		c: c,
@@ -35,10 +36,12 @@ func NewPlayerAddSubcommand(r player.PlayerRepository, c client.Client) *playerA
 	return cmd
 }
 
+// Init parses args before run
 func (s *playerAddSubcommand) Init(args []string) error {
 	return s.fs.Parse(args)
 }
 
+// Run executes command and add player to the bid list eventually
 func (s *playerAddSubcommand) Run() error {
 	info, err := s.c.FetchPlayerInfo(s.playerId)
 	if err != nil {

@@ -71,6 +71,4 @@ You can build app after changes using `make`. `soab` executable will be built in
 - do not generate new phpsessid everytime, store it for some time
 - add doc comments
 - bid subcommand:
-  - TEST FOR update deadline in db when needed
-  - TEST FOR delete player from db if cannot bid further
   - handle no funds for bid

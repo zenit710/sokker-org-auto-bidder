@@ -10,6 +10,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// timeLayout store time.Layout used inside sqlite
 const timeLayout = "2006-01-02 15:04:05"
 
 var _ PlayerRepository = &sqlitePlayerRepository{}
@@ -19,10 +20,12 @@ type sqlitePlayerRepository struct {
 	db *sql.DB
 }
 
+// NewSqlitePlayerRepository returns new repository with sqlite connection
 func NewSqlitePlayerRepository(path string) *sqlitePlayerRepository {
 	return &sqlitePlayerRepository{path: path}
 }
 
+// OpenConnection opens sqlite db connection
 func (r *sqlitePlayerRepository) OpenConnection() error {
 	db, err := sql.Open("sqlite3", r.path)
 	if err != nil {
@@ -33,6 +36,7 @@ func (r *sqlitePlayerRepository) OpenConnection() error {
 	return nil
 }
 
+// CreateSchema creates db structure if it is not created yet
 func (r *sqlitePlayerRepository) CreateSchema() error {
 	sqlStmt := `create table if not exists players (
 		playerId integer not null primary key,
