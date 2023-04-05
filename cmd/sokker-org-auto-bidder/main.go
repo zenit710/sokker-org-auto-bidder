@@ -6,11 +6,17 @@ import (
 	"sokker-org-auto-bidder/internal/client"
 	"sokker-org-auto-bidder/internal/repository/player"
 	"sokker-org-auto-bidder/internal/subcommands"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // main is a central point of application
 func main() {
-	// create client
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.TraceLevel)
+
+	log.Trace("create new http client instance")
 	var client client.Client = client.NewHttpClient(os.Getenv("SOKKER_USER"), os.Getenv("SOKKER_PASS"))
 
 	// create player repository
