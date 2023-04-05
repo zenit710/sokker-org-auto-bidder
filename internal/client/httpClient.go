@@ -103,6 +103,10 @@ func (s *httpClient) Bid(id, price uint) (*transferInfoResponse, error) {
 		return nil, err
 	}
 
+	if res.StatusCode == http.StatusBadRequest {
+		return nil, fmt.Errorf("no funds for player bid")
+	}
+
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("response status code: %d", res.StatusCode)
 	}
