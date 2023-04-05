@@ -69,6 +69,5 @@ You can build app after changes using `make`. `soab` executable will be built in
 - log debug/info/warning/errors to the file
 - write unit tests
 - do not generate new phpsessid everytime, store it for some time
-- add doc comments
 - bid subcommand:
   - handle no funds for bid

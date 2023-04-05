@@ -13,6 +13,7 @@ import (
 
 var _ Subcommand = &playerAddSubcommand{}
 
+// playerAddSubcommand handle player add command
 type playerAddSubcommand struct {
 	c client.Client
 	r player.PlayerRepository

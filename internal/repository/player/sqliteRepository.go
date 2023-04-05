@@ -15,6 +15,7 @@ const timeLayout = "2006-01-02 15:04:05"
 
 var _ PlayerRepository = &sqlitePlayerRepository{}
 
+// sqlitePlayerRepository handle sqlite connection for player bid list
 type sqlitePlayerRepository struct {
 	path string
 	db *sql.DB

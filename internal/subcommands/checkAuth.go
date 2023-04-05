@@ -7,6 +7,7 @@ import (
 
 var _ Subcommand = &checkAuthSubcommand{}
 
+// checkAuthSubcommand handle auth check command
 type checkAuthSubcommand struct {
 	c client.Client
 }

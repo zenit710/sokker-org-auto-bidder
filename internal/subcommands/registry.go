@@ -2,6 +2,7 @@ package subcommands
 
 import "fmt"
 
+// subcommandRegistry manage available commands
 type subcommandRegistry struct {
 	m map[string]Subcommand
 }

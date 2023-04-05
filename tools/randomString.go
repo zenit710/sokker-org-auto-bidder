@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// charset is default charset to create random string
 const charset = "abcdefghijklmnopqrstuvwxyz" +
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 

@@ -14,12 +14,17 @@ import (
 var _ Client = &httpClient{}
 
 const (
+	// urlAuth is sokker API endpoint for user authorization
 	urlAuth = "https://sokker.org/api/auth/login"
+	// urlClubInfo is sokker API endpoint with user club info
 	urlClubInfo = "https://sokker.org/api/current"
+	// urlPlayerInfoFormat is sokker API endpoint (has to be filled with playerId) with player info
 	urlPlayerInfoFormat = "https://sokker.org/api/player/%d"
+	// urlPlayerBidFormat is sokker API endpoint (has to be filled with playerId) for transfer bid
 	urlPlayerBidFormat = "https://sokker.org/api/transfer/%d/bid"
 )
 
+// httpClient handles connection with sokker API through http
 type httpClient struct {
 	user string
 	pass string
@@ -111,11 +116,15 @@ func (s *httpClient) Bid(id, price uint) (*transferInfoResponse, error) {
 	return p, nil
 }
 
+/*
+	makeRequest sends new JSON http request with body made from interface{}.
+	PHPSESSID cookie is passed with this request.
+*/
 func (s *httpClient) makeRequest(url string, method string, body interface{}) (*http.Response, error) {
 	var bodyReader io.Reader = nil
 	
 	if body != nil {
-		// prepare auth request body
+		// prepare request body
 		jsonBody, err := json.Marshal(body)
 		if err != nil {
 			fmt.Println("marshal error, body to json")
@@ -124,7 +133,7 @@ func (s *httpClient) makeRequest(url string, method string, body interface{}) (*
 		bodyReader = bytes.NewReader(jsonBody)
 	}
 
-	// prepare bid request
+	// prepare request
 	req, err := http.NewRequest(method, url, bodyReader)
 	if err != nil {
 		fmt.Println("request error")
@@ -133,10 +142,12 @@ func (s *httpClient) makeRequest(url string, method string, body interface{}) (*
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("cookie", fmt.Sprintf("PHPSESSID=%s", s.sessId))
 
-	// // make http request
+	// make http request
 	return http.DefaultClient.Do(req)
 }
 
+
+// extractResponseObject parse response to interface{} 
 func extractResponseObject(res *http.Response, obj interface{}) (error) {
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {

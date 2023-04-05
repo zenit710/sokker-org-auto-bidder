@@ -13,19 +13,23 @@ import (
 
 var _ Subcommand = &bidSubcommand{}
 
+// bidSubcommand handle player bid action
 type bidSubcommand struct {
 	r player.PlayerRepository
 	c client.Client
 }
 
+// NewBidSubcommand returns new player bid command handler
 func NewBidSubcommand(r player.PlayerRepository, c client.Client) *bidSubcommand {
 	return &bidSubcommand{r: r, c: c}
 }
 
+// Init does nothing, bid command do not require extra arguments
 func (s *bidSubcommand) Init(args []string) error {
 	return nil
 }
 
+// Run executes bid subcommand
 func (s *bidSubcommand) Run() error {
 	log.Print("make bid for listed players:")
 
@@ -52,6 +56,7 @@ func (s *bidSubcommand) Run() error {
 	return nil
 }
 
+// handlePlayer handle player bid process
 func (s *bidSubcommand) handlePlayer(p *model.Player, clubId uint) error {
 	log.Printf("%v", p)
 

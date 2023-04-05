@@ -8,6 +8,7 @@ import (
 	"sokker-org-auto-bidder/internal/subcommands"
 )
 
+// main is a central point of application
 func main() {
 	// create client
 	var client client.Client = client.NewHttpClient(os.Getenv("SOKKER_USER"), os.Getenv("SOKKER_PASS"))
@@ -37,6 +38,7 @@ func main() {
 	}
 }
 
+// createPlayerRepository returns new player.PlayerRepository instance
 func createPlayerRepository() player.PlayerRepository {
 	playerRepository := player.NewSqlitePlayerRepository("./bidder.db")
 	if err := playerRepository.Init(); err != nil {
@@ -46,6 +48,7 @@ func createPlayerRepository() player.PlayerRepository {
 	return playerRepository
 }
 
+// logError logs error message and exits program
 func logError(msg string) {
 	fmt.Println(msg)
 	os.Exit(1)
