@@ -99,7 +99,6 @@ func (s *httpClient) Bid(id, price uint) (*transferInfoResponse, error) {
 	// make http request
 	res, err := s.makeRequest(bidUrl, http.MethodPut, body)
 	if err != nil {
-		fmt.Println("request sent but error")
 		return nil, err
 	}
 
@@ -131,7 +130,6 @@ func (s *httpClient) makeRequest(url string, method string, body interface{}) (*
 		// prepare request body
 		jsonBody, err := json.Marshal(body)
 		if err != nil {
-			fmt.Println("marshal error, body to json")
 			return nil, err
 		}
 		bodyReader = bytes.NewReader(jsonBody)
@@ -140,7 +138,6 @@ func (s *httpClient) makeRequest(url string, method string, body interface{}) (*
 	// prepare request
 	req, err := http.NewRequest(method, url, bodyReader)
 	if err != nil {
-		fmt.Println("request error")
 		return nil, err
 	}
 	req.Header.Set("content-type", "application/json")
@@ -155,14 +152,11 @@ func (s *httpClient) makeRequest(url string, method string, body interface{}) (*
 func extractResponseObject(res *http.Response, obj interface{}) (error) {
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println("cannot read body")
 		return err
 	}
 	res.Body.Close()
 
 	if err = json.Unmarshal(body, obj); err != nil {
-		fmt.Println("unmarshal error")
-		fmt.Println(string(body))
 		return err
 	}
 
