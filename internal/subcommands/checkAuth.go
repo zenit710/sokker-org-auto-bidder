@@ -1,6 +1,7 @@
 package subcommands
 
 import (
+	"errors"
 	"fmt"
 	"sokker-org-auto-bidder/internal/client"
 )
@@ -25,11 +26,15 @@ func (s *checkAuthSubcommand) Init(args []string) error {
 // Run executes subcommand
 func (s *checkAuthSubcommand) Run() error {
 	club, err := s.c.Auth()
-	if err != nil {
+	if err != nil && !errors.Is(err, client.ErrBadCredentials) {
 		return err
 	}
 
-	fmt.Printf("Auth success! Club ID: %d\n", club.Team.Id)
+	if club == nil {
+		fmt.Printf("Auth failed.\n")
+	} else {
+		fmt.Printf("Auth success! Club ID: %d\n", club.Team.Id)
+	}
 	
 	return nil
 }
