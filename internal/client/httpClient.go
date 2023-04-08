@@ -63,19 +63,23 @@ func (s *httpClient) Auth() (*clubInfoResponse, error) {
 }
 
 func (s*httpClient) ClubInfo() (*clubInfoResponse, error) {
-	// make http request
+	log.Trace("make club info request")
 	res, err := s.makeRequest(urlClubInfo, http.MethodGet, nil)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 
+	log.Debugf("club info request http status code: %d", res.StatusCode)
 	if res.StatusCode != http.StatusOK {
 		return nil, errors.New("unauthorized")
 	}
 
+	log.Trace("parse club info response")
 	c := &clubInfoResponse{}
 	err = extractResponseObject(res, c)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 
