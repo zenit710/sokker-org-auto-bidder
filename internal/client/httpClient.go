@@ -106,16 +106,18 @@ func (s *httpClient) FetchPlayerInfo(id uint) (*playerInfoResponse ,error) {
 }
 
 func (s *httpClient) Bid(id, price uint) (*transferInfoResponse, error) {
-	// prepare req params
+	log.Trace("prepare bid request body object")
 	body := &bidReqBody{Value: price}
 	bidUrl := fmt.Sprintf(urlPlayerBidFormat, id)
 
-	// make http request
+	log.Tracef("make player (%d) bid request")
 	res, err := s.makeRequest(bidUrl, http.MethodPut, body)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 
+	log.Debugf("player (%d) bid request http status code: %d", id, res.StatusCode)
 	if res.StatusCode == http.StatusBadRequest {
 		return nil, fmt.Errorf("no funds for player bid")
 	}
@@ -124,9 +126,11 @@ func (s *httpClient) Bid(id, price uint) (*transferInfoResponse, error) {
 		return nil, fmt.Errorf("response status code: %d", res.StatusCode)
 	}
 
+	log.Tracef("parse player (%d) bid response", id)
 	p := &transferInfoResponse{}
 	err = extractResponseObject(res, p)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 
