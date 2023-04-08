@@ -145,23 +145,26 @@ func (s *httpClient) makeRequest(url string, method string, body interface{}) (*
 	var bodyReader io.Reader = nil
 	
 	if body != nil {
-		// prepare request body
+		log.Trace("request has body to send, convert to json")
 		jsonBody, err := json.Marshal(body)
 		if err != nil {
+			log.Error(err)
 			return nil, err
 		}
 		bodyReader = bytes.NewReader(jsonBody)
 	}
 
-	// prepare request
+	log.Trace("prepare request")
 	req, err := http.NewRequest(method, url, bodyReader)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
+	log.Trace("set request headers (content-type, coookie PHPSESSID)")
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("cookie", fmt.Sprintf("PHPSESSID=%s", s.sessId))
 
-	// make http request
+	log.Trace("make http request")
 	return http.DefaultClient.Do(req)
 }
 
