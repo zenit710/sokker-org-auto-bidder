@@ -87,14 +87,18 @@ func (s*httpClient) ClubInfo() (*clubInfoResponse, error) {
 }
 
 func (s *httpClient) FetchPlayerInfo(id uint) (*playerInfoResponse ,error) {
+	log.Tracef("make player (%d) info request", id)
 	res, err := http.Get(fmt.Sprintf(urlPlayerInfoFormat, id))
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 
+	log.Tracef("parse player (%d) info response", id)
 	p := &playerInfoResponse{}
 	err = extractResponseObject(res, p)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 
