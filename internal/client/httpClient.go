@@ -9,6 +9,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"sokker-org-auto-bidder/tools"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var _ Client = &httpClient{}
@@ -34,24 +36,28 @@ type httpClient struct {
 
 // NewHttpClient returns new HttpClient for sokker.org
 func NewHttpClient(user, pass string) *httpClient {
+	log.Trace("creating new http client for sokker.org")
 	return &httpClient{user: user, pass: pass, auth: false, sessId: tools.String(26)}
 }
 
 func (s *httpClient) Auth() (*clubInfoResponse, error) {
-	// prepare auth request body
+	log.Trace("prepare auth request body object")
 	body := &loginReqBody{Login: s.user, Pass: s.pass}
 
-	// make http request
+	log.Trace("make auth request")
 	res, err := s.makeRequest(urlAuth, http.MethodPost, body)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 
+	log.Debugf("auth request http status code: %d", res.StatusCode)
 	if res.StatusCode != http.StatusOK {
 		return nil, ErrBadCredentials
 	}
 
 	s.auth = true
+	log.Debug("authenication successful")
 
 	return s.ClubInfo()
 }

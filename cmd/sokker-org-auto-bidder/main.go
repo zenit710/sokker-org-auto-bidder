@@ -14,7 +14,7 @@ import (
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetOutput(os.Stdout)
-	log.SetLevel(log.TraceLevel)
+	log.SetLevel(log.TraceLevel) // TODO: -v Warning, -vv Debug, -vvv Trace
 
 	log.Trace("create new http client instance")
 	var client client.Client = client.NewHttpClient(os.Getenv("SOKKER_USER"), os.Getenv("SOKKER_PASS"))
@@ -35,9 +35,9 @@ func main() {
 	}
 
 	subcommand := os.Args[1]
-	log.Tracef("%s subcommand chosen", subcommand)
+	log.Infof("%s subcommand chosen", subcommand)
 	args := os.Args[2:]
-	log.Tracef("subcommand args: %v", args)
+	log.Infof("subcommand args: %v", args)
 
 	log.Trace("execute subcommand")
 	if err := subCmdRegistry.Run(subcommand, args); err != nil {

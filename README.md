@@ -67,6 +67,7 @@ You can build app after changes using `make`. `soab` executable will be built in
 
 - print meaningful messages insted of db/http errors for example
 - log debug/info/warning/errors to the file
+- log level based on command args: -v Warning, -vv Debug, -vvv Trace
 - write unit tests
 - do not generate new phpsessid everytime, store it for some time
 - bid subcommand:
