@@ -171,17 +171,19 @@ func (s *httpClient) makeRequest(url string, method string, body interface{}) (*
 
 // extractResponseObject parse response to interface{} 
 func extractResponseObject(res *http.Response, obj interface{}) (error) {
+	log.Trace("read http response body")
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
+		log.Error(err)
 		return err
 	}
 	res.Body.Close()
 
+	log.Trace("parse json response to object")
 	if err = json.Unmarshal(body, obj); err != nil {
+		log.Error(err)
 		return err
 	}
-
-	fmt.Println(obj)
 
 	return nil
 }
