@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"sokker-org-auto-bidder/internal/client"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var _ Subcommand = &checkAuthSubcommand{}
@@ -15,6 +17,7 @@ type checkAuthSubcommand struct {
 
 // NewCheckAuthSubcommand returns new subcommand for checking auth
 func NewCheckAuthSubcommand(c client.Client) *checkAuthSubcommand {
+	log.Trace("creating new check auth subcommand handler")
 	return &checkAuthSubcommand{c: c}
 }
 
@@ -25,8 +28,12 @@ func (s *checkAuthSubcommand) Init(args []string) error {
 
 // Run executes subcommand
 func (s *checkAuthSubcommand) Run() error {
+	log.Trace("execute check auth subcommand")
+
+	log.Trace("auth in sokker.org")
 	club, err := s.c.Auth()
 	if err != nil && !errors.Is(err, client.ErrBadCredentials) {
+		log.Error(err)
 		return err
 	}
 
