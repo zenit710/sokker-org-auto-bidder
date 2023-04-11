@@ -3,12 +3,13 @@ package subcommands
 import (
 	"flag"
 	"fmt"
-	"log"
 	"sokker-org-auto-bidder/internal/client"
 	"sokker-org-auto-bidder/internal/model"
 	"sokker-org-auto-bidder/internal/repository/player"
 	"sokker-org-auto-bidder/tools"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var _ Subcommand = &playerAddSubcommand{}
@@ -25,12 +26,14 @@ type playerAddSubcommand struct {
 
 // NewPlayerAddSubcommand returns new subcommand for adding players to the DB
 func NewPlayerAddSubcommand(r player.PlayerRepository, c client.Client) *playerAddSubcommand {
+	log.Trace("creating new player add subcommand handler")
 	cmd := &playerAddSubcommand{
 		c: c,
 		r: r,
 		fs: flag.NewFlagSet("add", flag.ExitOnError),
 	}
 
+	log.Trace("register command flags")
 	cmd.fs.UintVar(&cmd.playerId, "playerId", 0, "Player ID")
 	cmd.fs.UintVar(&cmd.maxPrice, "maxPrice", 0, "Maxium price for player to bid")
 
@@ -39,45 +42,51 @@ func NewPlayerAddSubcommand(r player.PlayerRepository, c client.Client) *playerA
 
 // Init parses args before run
 func (s *playerAddSubcommand) Init(args []string) error {
+	log.Trace("parse command flags")
 	return s.fs.Parse(args)
 }
 
 // Run executes command and add player to the bid list eventually
 func (s *playerAddSubcommand) Run() error {
+	log.Tracef("execute player %d add subcommand", s.playerId)
+
+	log.Trace("fetch info about player")
 	info, err := s.c.FetchPlayerInfo(s.playerId)
 	if err != nil {
+		log.Error(err)
 		return err
 	}
 
-	// check can be any bid made
+	log.Trace("check can make bid (max price vs current price)")
 	if s.maxPrice < info.Transfer.Price.MinBid.Value {
 		return fmt.Errorf("minimum price for this player is %d", info.Transfer.Price.MinBid.Value)
 	}
 
-	// get transfer deadline time including timezone
+	log.Trace("parse transfer deadline time")
 	dt, err := tools.TimeInZone(client.TimeLayout, info.Transfer.Deadline.Date, info.Transfer.Deadline.Timezone)
 	if err != nil {
+		log.Error(err)
 		return err
 	}
 
-	// create player model
+	log.Trace("map player info from response to player model")
 	player := &model.Player{
 		Id: s.playerId,
 		MaxPrice: s.maxPrice,
 		Deadline: dt.In(time.UTC),
 	}
 
-	// validate player model
+	log.Trace("validate player model before save")
 	if err := player.Validate(); err != nil {
 		return err
 	}
 
-	// save player into the DB
+	log.Trace("add player to the bid list")
 	if err := s.r.Add(player); err != nil {
 		return err
 	}
 
-	log.Printf("player added to bid list: %v", player)
+	fmt.Printf("player added to bid list: %v\n", player)
 
 	return nil
 }
