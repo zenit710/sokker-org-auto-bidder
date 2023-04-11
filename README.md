@@ -68,6 +68,7 @@ You can build app after changes using `make`. `soab` executable will be built in
 - print meaningful messages insted of db/http errors for example
 - logs for subcommands
 - review log levels for all logs
+- add context to log messages
 - log debug/info/warning/errors to the file
 - log level based on command args: -v Warning, -vv Debug, -vvv Trace
 - playerRepository.List() - handle single player error - take care about other bids
