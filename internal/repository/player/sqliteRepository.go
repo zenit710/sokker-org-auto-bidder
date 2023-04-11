@@ -8,6 +8,7 @@ import (
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
+	log "github.com/sirupsen/logrus"
 )
 
 // timeLayout store time.Layout used inside sqlite
@@ -23,13 +24,16 @@ type sqlitePlayerRepository struct {
 
 // NewSqlitePlayerRepository returns new repository with sqlite connection
 func NewSqlitePlayerRepository(path string) *sqlitePlayerRepository {
+	log.Trace("creating new sqlite player repository")
 	return &sqlitePlayerRepository{path: path}
 }
 
 // OpenConnection opens sqlite db connection
 func (r *sqlitePlayerRepository) OpenConnection() error {
+	log.Tracef("opening sqlite3 connection for: %s", r.path)
 	db, err := sql.Open("sqlite3", r.path)
 	if err != nil {
+		log.Error(err)
 		return err
 	}
 	r.db = db 
@@ -45,7 +49,9 @@ func (r *sqlitePlayerRepository) CreateSchema() error {
 		deadline text not null
 		);`
 
+	log.Trace("create database schema if not exists")
 	if _, err := r.db.Exec(sqlStmt); err != nil {
+		log.Error(err)
 		return repository.NewErrRepositoryInitFailure(fmt.Sprintf("%q: %s", err.Error(), sqlStmt))
 	}
 
@@ -53,11 +59,14 @@ func (r *sqlitePlayerRepository) CreateSchema() error {
 }
 
 func (r *sqlitePlayerRepository) Init() error {
+	log.Trace("sqlite player repository init")
 	if err := r.OpenConnection(); err != nil {
+		log.Error(err)
 		return repository.NewErrRepositoryInitFailure(err.Error())
 	}
 
 	if err := r.CreateSchema(); err != nil {
+		log.Error(err)
 		return repository.NewErrRepositoryInitFailure(err.Error())
 	}
 
@@ -65,85 +74,50 @@ func (r *sqlitePlayerRepository) Init() error {
 }
 
 func (r *sqlitePlayerRepository) Add(player *model.Player) error {
-	// start db transaction
-	tx, err := r.db.Begin()
-	if err != nil {
-		return err
-	}
+	log.Tracef("add player to the bid list: %v", player)
 
-	// create player to bid insert statement
-	stmt, err := tx.Prepare(`insert into players (playerId, maxPrice, deadline) values(?, ?, datetime(?))`)
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-	
-	// set transaction values
-	_, err = stmt.Exec(player.Id, player.MaxPrice, player.Deadline.Format(time.RFC3339))
-	if err != nil {
-		return err
-	}
-
-	// commit db transaction
-	err = tx.Commit()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return r.makeTransaction(
+		`insert into players (playerId, maxPrice, deadline) values(?, ?, datetime(?))`,
+		player.Id, player.MaxPrice, player.Deadline.Format(time.RFC3339),
+	)
 }
 
 func (r *sqlitePlayerRepository) Delete(player *model.Player) error {
-	// start db transaction
-	tx, err := r.db.Begin()
-	if err != nil {
-		return err
-	}
+	log.Tracef("remove player from the bid list: %d", player.Id)
 
-	// delete player query
-	stmt, err := tx.Prepare(`delete from players where playerId = ?`)
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-	
-	// set transaction values
-	_, err = stmt.Exec(player.Id)
-	if err != nil {
-		return err
-	}
-
-	// commit db transaction
-	err = tx.Commit()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return r.makeTransaction(
+		`delete from players where playerId = ?`,
+		player.Id,
+	)
 }
 
 func (r *sqlitePlayerRepository) List() ([]*model.Player, error) {
-	// fetch players to bid from db
+	log.Trace("fetch players on bid list")
 	rows, err := r.db.Query(`select * from players where deadline > datetime("now")`)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	defer rows.Close()
 
 	players := []*model.Player{}
 
-	// convert db rows to player model
+	log.Trace("convert db entries to player models")
 	for rows.Next() {
 		player := &model.Player{}
 		var dt string
 
+		log.Trace("map entry to player model properties")
 		err = rows.Scan(&player.Id, &player.MaxPrice, &dt)
 		if err != nil {
+			log.Error(err)
 			return nil, err
 		}
 
+		log.Trace("parse deadline time")
 		deadline, err := time.Parse(timeLayout, dt)
 		if err != nil {
+			log.Error(err)
 			return nil, err
 		}
 
@@ -155,34 +129,48 @@ func (r *sqlitePlayerRepository) List() ([]*model.Player, error) {
 }
 
 func (r *sqlitePlayerRepository) Update(player *model.Player) error {
-	// start db transaction
+	log.Tracef("update player on bid list: %d", player.Id)
+
+	return r.makeTransaction(
+		`update players set maxPrice = ?, deadline = datetime(?) where playerId = ?`,
+		player.MaxPrice, player.Deadline.Format(time.RFC3339), player.Id,
+	)
+}
+
+func (r *sqlitePlayerRepository) Close() {
+	log.Trace("close db connection")
+	r.db.Close()
+}
+
+// makeTransaction handles DB transaction
+func (r *sqlitePlayerRepository) makeTransaction(sql string, params ...interface{}) error {
+	log.Trace("create db transaction")
 	tx, err := r.db.Begin()
 	if err != nil {
+		log.Error(err)
 		return err
 	}
 
-	// update player query
-	stmt, err := tx.Prepare(`update players set maxPrice = ?, deadline = datetime(?) where playerId = ?`)
+	log.Trace("prepare sql statement")
+	stmt, err := tx.Prepare(sql)
 	if err != nil {
+		log.Error(err)
 		return err
 	}
 	defer stmt.Close()
 	
-	// set transaction values
-	_, err = stmt.Exec(player.MaxPrice, player.Deadline.Format(time.RFC3339), player.Id)
+	log.Trace("execute transaction")
+	_, err = stmt.Exec(params)
 	if err != nil {
+		log.Error(err)
 		return err
 	}
 
-	// commit db transaction
+	log.Trace("commit transaction")
 	err = tx.Commit()
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func (r *sqlitePlayerRepository) Close() {
-	r.db.Close()
 }
