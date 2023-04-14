@@ -1,6 +1,10 @@
 package subcommands
 
-import "fmt"
+import (
+	"fmt"
+
+	log "github.com/sirupsen/logrus"
+)
 
 // subcommandRegistry manage available commands
 type subcommandRegistry struct {
@@ -9,6 +13,7 @@ type subcommandRegistry struct {
 
 // NewSubcommandRegistry returns new empty registry for subcommands managment
 func NewSubcommandRegistry() *subcommandRegistry {
+	log.Trace("creating new subcommand registry")
 	r := &subcommandRegistry{}
 	r.m = make(map[string]Subcommand)
 	return r
@@ -16,25 +21,31 @@ func NewSubcommandRegistry() *subcommandRegistry {
 
 // Register adds subcommand to the registry on the name key
 func (s *subcommandRegistry) Register(name string, cmd Subcommand) {
+	log.Tracef("register new subcommand %s", name)
 	s.m[name] = cmd
 }
 
 // Run executes subcommand registered on name key with provided args
 func (s *subcommandRegistry) Run(name string, args []string) error {
+	log.Tracef("trying to run %s subcommand", name)
 	cmd := s.m[name]
 	if cmd == nil {
 		return &ErrSubcommandNotAvailable{Name: name, Available: s.GetSubcommandNames()}
 	}
 	
+	log.Tracef("%s subcommand init with args %v", name, args)
 	if err := cmd.Init(args); err != nil {
+		log.Error(err)
 		return err
 	}
 
+	log.Trace("%s subcommand run", name)
 	return cmd.Run()
 }
 
 // GetSubcommandNames returns key names of all registered subcommands
 func (s *subcommandRegistry) GetSubcommandNames() []string {
+	log.Trace("get all registered subcommand names")
 	names := make([]string, len(s.m))
 
 	i := 0
