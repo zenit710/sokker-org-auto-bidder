@@ -66,9 +66,7 @@ You can build app after changes using `make`. `soab` executable will be built in
 ## TODO
 
 - print meaningful messages insted of db/http errors for example
-- review log levels for all logs
 - log debug/info/warning/errors to the file
-- log level based on command args: -v Warning, -vv Debug, -vvv Trace
 - playerRepository.List() - handle single player error - take care about other bids
 - write unit tests
 - do not generate new phpsessid everytime, store it for some time

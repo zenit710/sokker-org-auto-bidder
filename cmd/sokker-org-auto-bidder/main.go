@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"sokker-org-auto-bidder/internal/client"
@@ -10,12 +11,24 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var logTraceLvl, logDebugLvl, logWarnLvl bool
+
+// init initiaties module before run
+func init() {
+	flag.BoolVar(&logWarnLvl, "v", false, "show logs up to warning level")
+	flag.BoolVar(&logDebugLvl, "vv", false, "show logs up to debug level")
+	flag.BoolVar(&logTraceLvl, "vvv", false, "show all logs including trace messages")
+}
+
 // main is a central point of application
 func main() {
+	flag.Parse()
+	args := flag.Args()
+
 	log.SetFormatter(&log.TextFormatter{})
 	log.SetOutput(os.Stdout)
-	log.SetLevel(log.TraceLevel) // TODO: -v Warning, -vv Debug, -vvv Trace
 	log.SetReportCaller(true)
+	log.SetLevel(getLogLevel()) // TODO: -v Warning, -vv Debug, -vvv Trace
 
 	log.Trace("create new http client instance")
 	var client client.Client = client.NewHttpClient(os.Getenv("SOKKER_USER"), os.Getenv("SOKKER_PASS"))
@@ -31,17 +44,17 @@ func main() {
 	subCmdRegistry.Register("check-auth", subcommands.NewCheckAuthSubcommand(client))
 
 	log.Trace("check is subcommand provided")
-	if len(os.Args) < 2 {
+	if len(args) == 0 {
 		printError(fmt.Sprintf("No subcommand provided. Try one of %v", subCmdRegistry.GetSubcommandNames()))
 	}
 
-	subcommand := os.Args[1]
+	subcommand := args[0]
 	log.Infof("%s subcommand chosen", subcommand)
-	args := os.Args[2:]
-	log.Infof("subcommand args: %v", args)
+	subcommandArgs := args[1:]
+	log.Infof("subcommand args: %v", subcommandArgs)
 
 	log.Trace("execute subcommand")
-	if err := subCmdRegistry.Run(subcommand, args); err != nil {
+	if err := subCmdRegistry.Run(subcommand, subcommandArgs); err != nil {
 		log.Error(err)
 		printError("Command execution failed. Run with -v flag for more information")
 	}
@@ -62,4 +75,12 @@ func createPlayerRepository() player.PlayerRepository {
 func printError(msg string) {
 	fmt.Println(msg)
 	os.Exit(1)
+}
+
+// getLogLevel returns log level on command flags base
+func getLogLevel() log.Level {
+	if logTraceLvl {return log.TraceLevel}
+	if logDebugLvl {return log.DebugLevel}
+	if logWarnLvl {return log.WarnLevel}
+	return log.PanicLevel
 }
