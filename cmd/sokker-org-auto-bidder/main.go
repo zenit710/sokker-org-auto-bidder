@@ -12,9 +12,10 @@ import (
 
 // main is a central point of application
 func main() {
-	log.SetFormatter(&log.JSONFormatter{})
+	log.SetFormatter(&log.TextFormatter{})
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.TraceLevel) // TODO: -v Warning, -vv Debug, -vvv Trace
+	log.SetReportCaller(true)
 
 	log.Trace("create new http client instance")
 	var client client.Client = client.NewHttpClient(os.Getenv("SOKKER_USER"), os.Getenv("SOKKER_PASS"))

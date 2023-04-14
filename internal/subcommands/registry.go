@@ -39,7 +39,7 @@ func (s *subcommandRegistry) Run(name string, args []string) error {
 		return err
 	}
 
-	log.Trace("%s subcommand run", name)
+	log.Tracef("%s subcommand run", name)
 	return cmd.Run()
 }
 
