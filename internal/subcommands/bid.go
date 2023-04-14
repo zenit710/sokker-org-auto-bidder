@@ -35,21 +35,21 @@ func (s *bidSubcommand) Init(args []string) error {
 func (s *bidSubcommand) Run() error {
 	log.Trace("make bid for listed players")
 
-	log.Trace("fetch players to bid")
+	log.Debug("fetch players to bid")
 	players, err := s.r.List()
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
-	log.Trace("auth in sokker.org")
+	log.Debug("auth in sokker.org")
 	club, err := s.c.Auth()
 	if err != nil {
 		log.Error(err)
 		return fmt.Errorf("authorization error")
 	}
 
-	log.Trace("make players bids")
+	log.Debug("make players bids")
 	for _, player := range players {
 		err := s.handlePlayer(player, club.Team.Id)
 		if err != nil {
@@ -66,7 +66,7 @@ func (s *bidSubcommand) Run() error {
 func (s *bidSubcommand) handlePlayer(p *model.Player, clubId uint) error {
 	log.Tracef("handle player %d bid", p.Id)
 
-	log.Tracef("fetch transfer info")
+	log.Debugf("fetch player %d transfer info", p.Id)
 	info, err := s.c.FetchPlayerInfo(p.Id)
 	if err != nil {
 		log.Error(err)
@@ -88,7 +88,7 @@ func (s *bidSubcommand) handlePlayer(p *model.Player, clubId uint) error {
 		return errors.New("you are current leader, no reason to bid")
 	}
 
-	log.Trace("make player bid")
+	log.Debugf("make player %d bid", p.Id)
 	tr, err := s.c.Bid(p.Id, info.Transfer.Price.MinBid.Value)
 	if err != nil {
 		log.Error(err)
@@ -106,7 +106,7 @@ func (s *bidSubcommand) handlePlayer(p *model.Player, clubId uint) error {
 	if p.Deadline.Before(newDeadline) {
 		p.Deadline = newDeadline.In(time.UTC)
 
-		log.Trace("update player transfer deadline")
+		log.Debug("update player transfer deadline")
 		if err = s.r.Update(p); err != nil {
 			fmt.Println("player transfer deadline was not updated, it can lead to mistakes, sorry")
 		}

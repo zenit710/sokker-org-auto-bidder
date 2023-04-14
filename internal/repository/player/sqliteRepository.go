@@ -64,6 +64,7 @@ func (r *sqlitePlayerRepository) Init() error {
 		log.Error(err)
 		return repository.NewErrRepositoryInitFailure(err.Error())
 	}
+	log.Debug("sqlite connection open")
 
 	if err := r.CreateSchema(); err != nil {
 		log.Error(err)
@@ -138,7 +139,7 @@ func (r *sqlitePlayerRepository) Update(player *model.Player) error {
 }
 
 func (r *sqlitePlayerRepository) Close() {
-	log.Trace("close db connection")
+	log.Debug("close db connection")
 	r.db.Close()
 }
 

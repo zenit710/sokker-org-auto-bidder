@@ -94,6 +94,8 @@ func (s *httpClient) FetchPlayerInfo(id uint) (*playerInfoResponse ,error) {
 		return nil, err
 	}
 
+	log.Debugf("fetch player info request http status code: %d", res.StatusCode)
+
 	log.Tracef("parse player (%d) info response", id)
 	p := &playerInfoResponse{}
 	err = extractResponseObject(res, p)
@@ -138,8 +140,8 @@ func (s *httpClient) Bid(id, price uint) (*transferInfoResponse, error) {
 }
 
 /*
-	makeRequest sends new JSON http request with body made from interface{}.
-	PHPSESSID cookie is passed with this request.
+makeRequest sends new JSON http request with body made from interface{}.
+PHPSESSID cookie is passed with this request.
 */
 func (s *httpClient) makeRequest(url string, method string, body interface{}) (*http.Response, error) {
 	var bodyReader io.Reader = nil

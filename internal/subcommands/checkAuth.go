@@ -30,7 +30,7 @@ func (s *checkAuthSubcommand) Init(args []string) error {
 func (s *checkAuthSubcommand) Run() error {
 	log.Trace("execute check auth subcommand")
 
-	log.Trace("auth in sokker.org")
+	log.Debug("auth in sokker.org")
 	club, err := s.c.Auth()
 	if err != nil && !errors.Is(err, client.ErrBadCredentials) {
 		log.Error(err)

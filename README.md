@@ -66,7 +66,6 @@ You can build app after changes using `make`. `soab` executable will be built in
 ## TODO
 
 - print meaningful messages insted of db/http errors for example
-- logs for subcommands
 - review log levels for all logs
 - log debug/info/warning/errors to the file
 - log level based on command args: -v Warning, -vv Debug, -vvv Trace

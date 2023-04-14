@@ -50,7 +50,7 @@ func (s *playerAddSubcommand) Init(args []string) error {
 func (s *playerAddSubcommand) Run() error {
 	log.Tracef("execute player %d add subcommand", s.playerId)
 
-	log.Trace("fetch info about player")
+	log.Debug("fetch info about player")
 	info, err := s.c.FetchPlayerInfo(s.playerId)
 	if err != nil {
 		log.Error(err)
@@ -69,7 +69,7 @@ func (s *playerAddSubcommand) Run() error {
 		return err
 	}
 
-	log.Trace("map player info from response to player model")
+	log.Trace("map player from response to player model")
 	player := &model.Player{
 		Id: s.playerId,
 		MaxPrice: s.maxPrice,
@@ -81,7 +81,7 @@ func (s *playerAddSubcommand) Run() error {
 		return err
 	}
 
-	log.Trace("add player to the bid list")
+	log.Debug("add player to the bid list")
 	if err := s.r.Add(player); err != nil {
 		return err
 	}
