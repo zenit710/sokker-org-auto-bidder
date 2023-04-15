@@ -48,7 +48,7 @@ func (s *httpClient) Auth() (*clubInfoResponse, error) {
 	res, err := s.makeRequest(urlAuth, http.MethodPost, body)
 	if err != nil {
 		log.Error(err)
-		return nil, err
+		return nil, &ErrRequestFailed{"auth"}
 	}
 
 	log.Debugf("auth request http status code: %d", res.StatusCode)
@@ -67,7 +67,7 @@ func (s*httpClient) ClubInfo() (*clubInfoResponse, error) {
 	res, err := s.makeRequest(urlClubInfo, http.MethodGet, nil)
 	if err != nil {
 		log.Error(err)
-		return nil, err
+		return nil, &ErrRequestFailed{"club info"}
 	}
 
 	log.Debugf("club info request http status code: %d", res.StatusCode)
@@ -80,7 +80,7 @@ func (s*httpClient) ClubInfo() (*clubInfoResponse, error) {
 	err = extractResponseObject(res, c)
 	if err != nil {
 		log.Error(err)
-		return nil, err
+		return nil, &ErrResponseParseFailed{"club info"}
 	}
 
 	return c, nil
@@ -91,7 +91,7 @@ func (s *httpClient) FetchPlayerInfo(id uint) (*playerInfoResponse ,error) {
 	res, err := http.Get(fmt.Sprintf(urlPlayerInfoFormat, id))
 	if err != nil {
 		log.Error(err)
-		return nil, err
+		return nil, &ErrRequestFailed{fmt.Sprintf("player (%d) info", id)}
 	}
 
 	log.Debugf("fetch player (%d) info request http status code: %d", id, res.StatusCode)
@@ -101,7 +101,7 @@ func (s *httpClient) FetchPlayerInfo(id uint) (*playerInfoResponse ,error) {
 	err = extractResponseObject(res, p)
 	if err != nil {
 		log.Error(err)
-		return nil, err
+		return nil, &ErrResponseParseFailed{fmt.Sprintf("player (%d) info", id)}
 	}
 
 	return p, nil
@@ -116,7 +116,7 @@ func (s *httpClient) Bid(id, price uint) (*transferInfoResponse, error) {
 	res, err := s.makeRequest(bidUrl, http.MethodPut, body)
 	if err != nil {
 		log.Error(err)
-		return nil, err
+		return nil, &ErrRequestFailed{fmt.Sprintf("player (%d) bid", id)}
 	}
 
 	log.Debugf("player (%d) bid request http status code: %d", id, res.StatusCode)
@@ -125,7 +125,7 @@ func (s *httpClient) Bid(id, price uint) (*transferInfoResponse, error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("player (%d) bid response status code: %d", id, res.StatusCode)
+		return nil, fmt.Errorf("player (%d) bid response failed", id)
 	}
 
 	log.Tracef("parse player (%d) bid response", id)
@@ -133,7 +133,7 @@ func (s *httpClient) Bid(id, price uint) (*transferInfoResponse, error) {
 	err = extractResponseObject(res, p)
 	if err != nil {
 		log.Error(err)
-		return nil, err
+		return nil, &ErrResponseParseFailed{fmt.Sprintf("player (%d) bid", id)}
 	}
 
 	return p, nil
@@ -151,7 +151,7 @@ func (s *httpClient) makeRequest(url string, method string, body interface{}) (*
 		jsonBody, err := json.Marshal(body)
 		if err != nil {
 			log.Error(err)
-			return nil, err
+			return nil, fmt.Errorf("%T object with value %v could not be transformed to JSON", body, body)
 		}
 		bodyReader = bytes.NewReader(jsonBody)
 	}
@@ -160,7 +160,7 @@ func (s *httpClient) makeRequest(url string, method string, body interface{}) (*
 	req, err := http.NewRequest(method, url, bodyReader)
 	if err != nil {
 		log.Error(err)
-		return nil, err
+		return nil, fmt.Errorf("could not create new http request")
 	}
 	log.Trace("set request headers (content-type, cookie)")
 	req.Header.Set("content-type", "application/json")
@@ -177,14 +177,14 @@ func extractResponseObject(res *http.Response, obj interface{}) (error) {
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		log.Error(err)
-		return err
+		return fmt.Errorf("could not read http response body %v", res.Body)
 	}
 	res.Body.Close()
 
 	log.Trace("parse json response to object")
 	if err = json.Unmarshal(body, obj); err != nil {
 		log.Error(err)
-		return err
+		return fmt.Errorf("could not transform http response to %T object", obj)
 	}
 
 	return nil
