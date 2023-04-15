@@ -21,25 +21,25 @@ func NewSubcommandRegistry() *subcommandRegistry {
 
 // Register adds subcommand to the registry on the name key
 func (s *subcommandRegistry) Register(name string, cmd Subcommand) {
-	log.Debugf("register new subcommand %s", name)
+	log.Debugf("register new subcommand '%s'", name)
 	s.m[name] = cmd
 }
 
 // Run executes subcommand registered on name key with provided args
 func (s *subcommandRegistry) Run(name string, args []string) error {
-	log.Tracef("trying to run %s subcommand", name)
+	log.Tracef("trying to run '%s' subcommand", name)
 	cmd := s.m[name]
 	if cmd == nil {
 		return &ErrSubcommandNotAvailable{Name: name, Available: s.GetSubcommandNames()}
 	}
 	
-	log.Debugf("%s subcommand init with args %v", name, args)
+	log.Debugf("'%s' subcommand init with args %v", name, args)
 	if err := cmd.Init(args); err != nil {
 		log.Error(err)
 		return err
 	}
 
-	log.Debugf("%s subcommand run", name)
+	log.Debugf("'%s' subcommand run", name)
 	return cmd.Run()
 }
 

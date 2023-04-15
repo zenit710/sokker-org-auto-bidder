@@ -75,7 +75,7 @@ func (r *sqlitePlayerRepository) Init() error {
 }
 
 func (r *sqlitePlayerRepository) Add(player *model.Player) error {
-	log.Tracef("add player to the bid list: %v", player)
+	log.Tracef("add player (%v) to the bid list", player)
 
 	return r.makeTransaction(
 		`insert into players (playerId, maxPrice, deadline) values(?, ?, datetime(?))`,
@@ -84,7 +84,7 @@ func (r *sqlitePlayerRepository) Add(player *model.Player) error {
 }
 
 func (r *sqlitePlayerRepository) Delete(player *model.Player) error {
-	log.Tracef("remove player from the bid list: %d", player.Id)
+	log.Tracef("remove player (%d) from the bid list", player.Id)
 
 	return r.makeTransaction(
 		`delete from players where playerId = ?`,
@@ -130,7 +130,7 @@ func (r *sqlitePlayerRepository) List() ([]*model.Player, error) {
 }
 
 func (r *sqlitePlayerRepository) Update(player *model.Player) error {
-	log.Tracef("update player on bid list: %d", player.Id)
+	log.Tracef("update player (%d) on bid list", player.Id)
 
 	return r.makeTransaction(
 		`update players set maxPrice = ?, deadline = datetime(?) where playerId = ?`,

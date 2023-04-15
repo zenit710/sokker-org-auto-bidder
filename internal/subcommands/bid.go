@@ -1,7 +1,6 @@
 package subcommands
 
 import (
-	"errors"
 	"fmt"
 	"sokker-org-auto-bidder/internal/client"
 	"sokker-org-auto-bidder/internal/model"
@@ -41,6 +40,7 @@ func (s *bidSubcommand) Run() error {
 		log.Error(err)
 		return err
 	}
+	log.Debugf("%d players for bid", len(players))
 
 	log.Debug("auth in sokker.org")
 	club, err := s.c.Auth()
@@ -53,9 +53,9 @@ func (s *bidSubcommand) Run() error {
 	for _, player := range players {
 		err := s.handlePlayer(player, club.Team.Id)
 		if err != nil {
-			fmt.Printf("(%d): %v\n", player.Id, err)
+			fmt.Printf("player (%d): %v\n", player.Id, err)
 		} else {
-			fmt.Printf("(%d): bid made\n", player.Id)
+			fmt.Printf("player (%d): bid made\n", player.Id)
 		}
 	}
 
@@ -64,51 +64,51 @@ func (s *bidSubcommand) Run() error {
 
 // handlePlayer handle player bid process
 func (s *bidSubcommand) handlePlayer(p *model.Player, clubId uint) error {
-	log.Tracef("handle player %d bid", p.Id)
+	log.Tracef("handle player (%d) bid", p.Id)
 
-	log.Debugf("fetch player %d transfer info", p.Id)
+	log.Debugf("fetch player (%d) transfer info", p.Id)
 	info, err := s.c.FetchPlayerInfo(p.Id)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
-	log.Trace("check can bid be made (value vs. max price)")
+	log.Tracef("check can player (%d) bid be made (value vs. max price)", p.Id)
 	if info.Transfer.Price.MinBid.Value > p.MaxPrice {
 		if err = s.r.Delete(p); err != nil {
 			log.Error(err)
-			fmt.Println("player did not remove from bid list, something went wrong")
+			fmt.Printf("player (%d) did not remove from bid list, something went wrong\n", p.Id)
 		}
 
-		return errors.New("max price reached, cannot bid further")
+		return fmt.Errorf("max price reached, cannot bid player (%d) further", p.Id)
 	}
 
-	log.Trace("check is bid neccessary (current leader)")
+	log.Tracef("check is player (%d) bid neccessary (current leader)", p.Id)
 	if info.Transfer.BuyerId == clubId {
-		return errors.New("you are current leader, no reason to bid")
+		return fmt.Errorf("you are current leader, no reason to bid player (%d)", p.Id)
 	}
 
-	log.Debugf("make player %d bid", p.Id)
+	log.Debugf("make player (%d) bid", p.Id)
 	tr, err := s.c.Bid(p.Id, info.Transfer.Price.MinBid.Value)
 	if err != nil {
 		log.Error(err)
-		return fmt.Errorf("bid could not be made: %v", err)
+		return fmt.Errorf("player (%d) bid could not be made: %v", p.Id, err)
 	}
 
-	log.Trace("parse transfer deadline time")
+	log.Tracef("parse player (%d) transfer deadline time", p.Id)
 	newDeadline, err := tools.TimeInZone(client.TimeLayout, tr.Deadline.Date.Date, tr.Deadline.Date.Timezone)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
-	log.Trace("check is transfer deadline still valid")
+	log.Tracef("check is player (%d) transfer deadline still valid", p.Id)
 	if p.Deadline.Before(newDeadline) {
 		p.Deadline = newDeadline.In(time.UTC)
 
-		log.Debug("update player transfer deadline")
+		log.Debugf("update player (%d) transfer deadline", p.Id)
 		if err = s.r.Update(p); err != nil {
-			fmt.Println("player transfer deadline was not updated, it can lead to mistakes, sorry")
+			fmt.Printf("player (%d) transfer deadline was not updated, it can lead to mistakes, sorry\n", p.Id)
 		}
 	}
 

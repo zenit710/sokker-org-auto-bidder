@@ -48,45 +48,45 @@ func (s *playerAddSubcommand) Init(args []string) error {
 
 // Run executes command and add player to the bid list eventually
 func (s *playerAddSubcommand) Run() error {
-	log.Tracef("execute player %d add subcommand", s.playerId)
+	log.Tracef("execute player (%d) add subcommand", s.playerId)
 
-	log.Debug("fetch info about player")
+	log.Debugf("fetch info about player (%d)", s.playerId)
 	info, err := s.c.FetchPlayerInfo(s.playerId)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
-	log.Trace("check can make bid (max price vs current price)")
+	log.Tracef("check can make player (%d) bid (max price vs current price)", s.playerId)
 	if s.maxPrice < info.Transfer.Price.MinBid.Value {
-		return fmt.Errorf("minimum price for this player is %d", info.Transfer.Price.MinBid.Value)
+		return fmt.Errorf("minimum price for player (%d) is %d", s.playerId, info.Transfer.Price.MinBid.Value)
 	}
 
-	log.Trace("parse transfer deadline time")
+	log.Tracef("parse player (%d) transfer deadline time", s.playerId)
 	dt, err := tools.TimeInZone(client.TimeLayout, info.Transfer.Deadline.Date, info.Transfer.Deadline.Timezone)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
-	log.Trace("map player from response to player model")
+	log.Tracef("map player (%d) from response to player model", s.playerId)
 	player := &model.Player{
 		Id: s.playerId,
 		MaxPrice: s.maxPrice,
 		Deadline: dt.In(time.UTC),
 	}
 
-	log.Trace("validate player model before save")
+	log.Tracef("validate player (%d) model before save", s.playerId)
 	if err := player.Validate(); err != nil {
 		return err
 	}
 
-	log.Debug("add player to the bid list")
+	log.Debugf("add player (%d) to the bid list", s.playerId)
 	if err := s.r.Add(player); err != nil {
 		return err
 	}
 
-	fmt.Printf("player added to bid list: %v\n", player)
+	fmt.Printf("player (%d) added to bid list: %v\n", s.playerId, player)
 
 	return nil
 }

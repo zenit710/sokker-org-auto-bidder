@@ -94,7 +94,7 @@ func (s *httpClient) FetchPlayerInfo(id uint) (*playerInfoResponse ,error) {
 		return nil, err
 	}
 
-	log.Debugf("fetch player info request http status code: %d", res.StatusCode)
+	log.Debugf("fetch player (%d) info request http status code: %d", id, res.StatusCode)
 
 	log.Tracef("parse player (%d) info response", id)
 	p := &playerInfoResponse{}
@@ -121,11 +121,11 @@ func (s *httpClient) Bid(id, price uint) (*transferInfoResponse, error) {
 
 	log.Debugf("player (%d) bid request http status code: %d", id, res.StatusCode)
 	if res.StatusCode == http.StatusBadRequest {
-		return nil, fmt.Errorf("no funds for player bid")
+		return nil, fmt.Errorf("no funds for player (%d) bid", id)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("response status code: %d", res.StatusCode)
+		return nil, fmt.Errorf("player (%d) bid response status code: %d", id, res.StatusCode)
 	}
 
 	log.Tracef("parse player (%d) bid response", id)
@@ -162,7 +162,7 @@ func (s *httpClient) makeRequest(url string, method string, body interface{}) (*
 		log.Error(err)
 		return nil, err
 	}
-	log.Trace("set request headers (content-type, coookie PHPSESSID)")
+	log.Trace("set request headers (content-type, cookie)")
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("cookie", fmt.Sprintf("PHPSESSID=%s", s.sessId))
 

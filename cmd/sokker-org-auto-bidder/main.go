@@ -28,7 +28,7 @@ func main() {
 	log.SetFormatter(&log.TextFormatter{})
 	log.SetOutput(os.Stdout)
 	log.SetReportCaller(true)
-	log.SetLevel(getLogLevel()) // TODO: -v Warning, -vv Debug, -vvv Trace
+	log.SetLevel(getLogLevel())
 
 	log.Trace("create new http client instance")
 	var client client.Client = client.NewHttpClient(os.Getenv("SOKKER_USER"), os.Getenv("SOKKER_PASS"))
