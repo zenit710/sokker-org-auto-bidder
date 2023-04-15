@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"sokker-org-auto-bidder/internal/model"
-	"sokker-org-auto-bidder/internal/repository"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -34,7 +33,7 @@ func (r *sqlitePlayerRepository) OpenConnection() error {
 	db, err := sql.Open("sqlite3", r.path)
 	if err != nil {
 		log.Error(err)
-		return err
+		return fmt.Errorf("could not open sqlite db %s", r.path)
 	}
 	r.db = db 
 
@@ -52,7 +51,7 @@ func (r *sqlitePlayerRepository) CreateSchema() error {
 	log.Trace("create database schema if not exists")
 	if _, err := r.db.Exec(sqlStmt); err != nil {
 		log.Error(err)
-		return repository.NewErrRepositoryInitFailure(fmt.Sprintf("%q: %s", err.Error(), sqlStmt))
+		return fmt.Errorf("create schema sql execution failed")
 	}
 
 	return nil
@@ -62,13 +61,13 @@ func (r *sqlitePlayerRepository) Init() error {
 	log.Trace("sqlite player repository init")
 	if err := r.OpenConnection(); err != nil {
 		log.Error(err)
-		return repository.NewErrRepositoryInitFailure(err.Error())
+		return fmt.Errorf("could not open sqlite connection")
 	}
 	log.Debug("sqlite connection open")
 
 	if err := r.CreateSchema(); err != nil {
 		log.Error(err)
-		return repository.NewErrRepositoryInitFailure(err.Error())
+		return fmt.Errorf("could not create schema for sqlite db")
 	}
 
 	return nil
@@ -97,7 +96,7 @@ func (r *sqlitePlayerRepository) List() ([]*model.Player, error) {
 	rows, err := r.db.Query(`select * from players where deadline > datetime("now")`)
 	if err != nil {
 		log.Error(err)
-		return nil, err
+		return nil, fmt.Errorf("could not fetch players to bid")
 	}
 	defer rows.Close()
 
@@ -111,15 +110,15 @@ func (r *sqlitePlayerRepository) List() ([]*model.Player, error) {
 		log.Trace("map entry to player model properties")
 		err = rows.Scan(&player.Id, &player.MaxPrice, &dt)
 		if err != nil {
-			log.Error(err)
-			return nil, err
+			log.Warn(fmt.Errorf("could not map player from db into the player model: %v", err))
+			continue
 		}
 
 		log.Trace("parse deadline time")
 		deadline, err := time.Parse(timeLayout, dt)
 		if err != nil {
-			log.Error(err)
-			return nil, err
+			log.Warn(fmt.Errorf("could not parse deadline time for player (%d): %v", player.Id, err))
+			continue
 		}
 
 		player.Deadline = deadline
@@ -149,14 +148,14 @@ func (r *sqlitePlayerRepository) makeTransaction(sql string, params ...interface
 	tx, err := r.db.Begin()
 	if err != nil {
 		log.Error(err)
-		return err
+		return fmt.Errorf("db transaction could not begin")
 	}
 
 	log.Trace("prepare sql statement")
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
 		log.Error(err)
-		return err
+		return fmt.Errorf("could not prepare sql statement: '%s'", sql)
 	}
 	defer stmt.Close()
 	
@@ -164,13 +163,14 @@ func (r *sqlitePlayerRepository) makeTransaction(sql string, params ...interface
 	_, err = stmt.Exec(params)
 	if err != nil {
 		log.Error(err)
-		return err
+		return fmt.Errorf("sql '%s' execution with params (%v) failed", sql, params)
 	}
 
 	log.Trace("commit transaction")
 	err = tx.Commit()
 	if err != nil {
-		return err
+		log.Error(err)
+		return fmt.Errorf("could not commit sql transaction")
 	}
 
 	return nil
