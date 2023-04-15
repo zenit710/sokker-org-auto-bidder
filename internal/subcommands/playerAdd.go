@@ -50,6 +50,15 @@ func (s *playerAddSubcommand) Init(args []string) error {
 func (s *playerAddSubcommand) Run() error {
 	log.Tracef("execute player (%d) add subcommand", s.playerId)
 
+	log.Tracef("validate player (%d) model before api calls", s.playerId)
+	player := &model.Player{
+		Id: s.playerId,
+		MaxPrice: s.maxPrice,
+	}
+	if err := player.Validate(); err != nil {
+		return err
+	}
+
 	log.Debugf("fetch info about player (%d)", s.playerId)
 	info, err := s.c.FetchPlayerInfo(s.playerId)
 	if err != nil {
@@ -69,12 +78,8 @@ func (s *playerAddSubcommand) Run() error {
 		return fmt.Errorf("could not parse player (%d) transfer deadlin time", s.playerId)
 	}
 
-	log.Tracef("map player (%d) from response to player model", s.playerId)
-	player := &model.Player{
-		Id: s.playerId,
-		MaxPrice: s.maxPrice,
-		Deadline: dt.In(time.UTC),
-	}
+	log.Tracef("set player (%d) transfer deadline in player model", s.playerId)
+	player.Deadline = dt.In(time.UTC)
 
 	log.Tracef("validate player (%d) model before save", s.playerId)
 	if err := player.Validate(); err != nil {

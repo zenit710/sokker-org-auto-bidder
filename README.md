@@ -65,9 +65,7 @@ You can build app after changes using `make`. `soab` executable will be built in
 
 ## TODO
 
-- check for required flags in commands (e.g. run `./soab add` without flags)
 - log debug/info/warning/errors to the file
-- playerRepository.List() - handle single player error - take care about other bids
 - write unit tests
 - do not generate new phpsessid everytime, store it for some time
 - bid subcommand:
