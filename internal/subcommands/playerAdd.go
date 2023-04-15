@@ -54,7 +54,7 @@ func (s *playerAddSubcommand) Run() error {
 	info, err := s.c.FetchPlayerInfo(s.playerId)
 	if err != nil {
 		log.Error(err)
-		return err
+		return fmt.Errorf("could not fetch player (%d) transfer details", s.playerId)
 	}
 
 	log.Tracef("check can make player (%d) bid (max price vs current price)", s.playerId)
@@ -66,7 +66,7 @@ func (s *playerAddSubcommand) Run() error {
 	dt, err := tools.TimeInZone(client.TimeLayout, info.Transfer.Deadline.Date, info.Transfer.Deadline.Timezone)
 	if err != nil {
 		log.Error(err)
-		return err
+		return fmt.Errorf("could not parse player (%d) transfer deadlin time", s.playerId)
 	}
 
 	log.Tracef("map player (%d) from response to player model", s.playerId)
@@ -78,12 +78,14 @@ func (s *playerAddSubcommand) Run() error {
 
 	log.Tracef("validate player (%d) model before save", s.playerId)
 	if err := player.Validate(); err != nil {
+		log.Error(err)
 		return err
 	}
 
 	log.Debugf("add player (%d) to the bid list", s.playerId)
 	if err := s.r.Add(player); err != nil {
-		return err
+		log.Error(err)
+		return fmt.Errorf("player (%d) could not be added to the bid list", s.playerId)
 	}
 
 	fmt.Printf("player (%d) added to bid list: %v\n", s.playerId, player)

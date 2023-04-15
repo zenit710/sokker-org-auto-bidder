@@ -65,8 +65,6 @@ You can build app after changes using `make`. `soab` executable will be built in
 
 ## TODO
 
-- print meaningful messages insted of db/http errors for example
-- deduplicate error logs
 - check for required flags in commands (e.g. run `./soab add` without flags)
 - log debug/info/warning/errors to the file
 - playerRepository.List() - handle single player error - take care about other bids

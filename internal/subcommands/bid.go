@@ -38,7 +38,7 @@ func (s *bidSubcommand) Run() error {
 	players, err := s.r.List()
 	if err != nil {
 		log.Error(err)
-		return err
+		return fmt.Errorf("could not fetch players to bid")
 	}
 	log.Debugf("%d players for bid", len(players))
 
@@ -70,7 +70,7 @@ func (s *bidSubcommand) handlePlayer(p *model.Player, clubId uint) error {
 	info, err := s.c.FetchPlayerInfo(p.Id)
 	if err != nil {
 		log.Error(err)
-		return err
+		return fmt.Errorf("could not fetch player (%d) transfer info", p.Id)
 	}
 
 	log.Tracef("check can player (%d) bid be made (value vs. max price)", p.Id)
@@ -99,7 +99,7 @@ func (s *bidSubcommand) handlePlayer(p *model.Player, clubId uint) error {
 	newDeadline, err := tools.TimeInZone(client.TimeLayout, tr.Deadline.Date.Date, tr.Deadline.Date.Timezone)
 	if err != nil {
 		log.Error(err)
-		return err
+		return fmt.Errorf("could not parse player (%d) transfer deadlin tine", p.Id)
 	}
 
 	log.Tracef("check is player (%d) transfer deadline still valid", p.Id)
@@ -108,7 +108,8 @@ func (s *bidSubcommand) handlePlayer(p *model.Player, clubId uint) error {
 
 		log.Debugf("update player (%d) transfer deadline", p.Id)
 		if err = s.r.Update(p); err != nil {
-			fmt.Printf("player (%d) transfer deadline was not updated, it can lead to mistakes, sorry\n", p.Id)
+			log.Error(err)
+			return fmt.Errorf("player (%d) transfer deadline was not updated, it can lead to mistakes, sorry", p.Id)
 		}
 	}
 

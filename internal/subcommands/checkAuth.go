@@ -34,7 +34,7 @@ func (s *checkAuthSubcommand) Run() error {
 	club, err := s.c.Auth()
 	if err != nil && !errors.Is(err, client.ErrBadCredentials) {
 		log.Error(err)
-		return err
+		return fmt.Errorf("authorization error")
 	}
 
 	if club == nil {
