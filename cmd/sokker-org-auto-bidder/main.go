@@ -55,8 +55,12 @@ func main() {
 
 	log.Trace("execute subcommand")
 	if err := subCmdRegistry.Run(subcommand, subcommandArgs); err != nil {
-		log.Error(err)
-		printError("Command execution failed. Run with -v flag for more information")
+		switch err.(type) {
+		case *subcommands.ErrMissingFlags: printError(fmt.Sprintf("Bad input: %v", err))
+		default:
+			log.Error(err)
+			printError("Command execution failed. Run with -v flag for more information")
+		}
 	}
 }
 

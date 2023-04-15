@@ -35,8 +35,12 @@ func (s *subcommandRegistry) Run(name string, args []string) error {
 	
 	log.Debugf("'%s' subcommand init with args %v", name, args)
 	if err := cmd.Init(args); err != nil {
-		log.Error(err)
-		return fmt.Errorf("'%s' subcommand initialization failed", name)
+		switch err.(type) {
+		case *ErrMissingFlags: return err
+		default:
+			log.Error(err)
+			return fmt.Errorf("'%s' subcommand initialization failed", name)
+		}
 	}
 
 	log.Debugf("'%s' subcommand run", name)

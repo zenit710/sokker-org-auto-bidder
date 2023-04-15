@@ -12,7 +12,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var _ Subcommand = &playerAddSubcommand{}
+var (
+	_ Subcommand = &playerAddSubcommand{}
+	requiredFlags = []string{"playerId", "maxPrice"}
+)
 
 // playerAddSubcommand handle player add command
 type playerAddSubcommand struct {
@@ -42,22 +45,29 @@ func NewPlayerAddSubcommand(r player.PlayerRepository, c client.Client) *playerA
 
 // Init parses args before run
 func (s *playerAddSubcommand) Init(args []string) error {
-	log.Trace("parse command flags")
-	return s.fs.Parse(args)
+	log.Trace("parse add subcommand args")
+	if err := s.fs.Parse(args); err != nil {
+		log.Error(err)
+		return fmt.Errorf("could not parse subcommand args")
+	}
+
+	log.Trace("verify required flags")
+	reqFlagsProvided := []string{}
+	s.fs.Visit(func(f *flag.Flag) {
+		if stringSliceContains(requiredFlags, f.Name) {
+			reqFlagsProvided = append(reqFlagsProvided, f.Name)
+		}
+	})
+	if len(reqFlagsProvided) < len(requiredFlags) {
+		return &ErrMissingFlags{requiredFlags}
+	}
+
+	return nil
 }
 
 // Run executes command and add player to the bid list eventually
 func (s *playerAddSubcommand) Run() error {
 	log.Tracef("execute player (%d) add subcommand", s.playerId)
-
-	log.Tracef("validate player (%d) model before api calls", s.playerId)
-	player := &model.Player{
-		Id: s.playerId,
-		MaxPrice: s.maxPrice,
-	}
-	if err := player.Validate(); err != nil {
-		return err
-	}
 
 	log.Debugf("fetch info about player (%d)", s.playerId)
 	info, err := s.c.FetchPlayerInfo(s.playerId)
@@ -78,8 +88,12 @@ func (s *playerAddSubcommand) Run() error {
 		return fmt.Errorf("could not parse player (%d) transfer deadlin time", s.playerId)
 	}
 
-	log.Tracef("set player (%d) transfer deadline in player model", s.playerId)
-	player.Deadline = dt.In(time.UTC)
+	log.Tracef("map player (%d) from response to player model", s.playerId)
+	player := &model.Player{
+		Id: s.playerId,
+		MaxPrice: s.maxPrice,
+		Deadline: dt.In(time.UTC),
+	}
 
 	log.Tracef("validate player (%d) model before save", s.playerId)
 	if err := player.Validate(); err != nil {
@@ -96,4 +110,13 @@ func (s *playerAddSubcommand) Run() error {
 	fmt.Printf("player (%d) added to bid list: %v\n", s.playerId, player)
 
 	return nil
+}
+
+func stringSliceContains(slice []string, search string) bool {
+	for _, s := range slice {
+		if s == search {
+			return true
+		}
+	}
+	return false
 }
