@@ -1,15 +1,20 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
 	"os"
 	"sokker-org-auto-bidder/internal/client"
 	"sokker-org-auto-bidder/internal/repository/player"
+	"sokker-org-auto-bidder/internal/repository/session"
 	"sokker-org-auto-bidder/internal/subcommands"
 
+	_ "github.com/mattn/go-sqlite3"
 	log "github.com/sirupsen/logrus"
 )
+
+const dbPath = "./bidder.db"
 
 var logTraceLvl, logDebugLvl, logWarnLvl bool
 
@@ -30,12 +35,26 @@ func main() {
 	log.SetReportCaller(true)
 	log.SetLevel(getLogLevel())
 
-	log.Trace("create new http client instance")
-	var client client.Client = client.NewHttpClient(os.Getenv("SOKKER_USER"), os.Getenv("SOKKER_PASS"))
+	log.Trace("open db connection")
+	db, err := openDbConnection(dbPath)
+	if err != nil {
+		log.Error(err)
+		printError("Can not open internal database. Run with -v flag for more information")
+	}
+	defer db.Close()
 
 	log.Trace("create player repository")
-	playerRepository := createPlayerRepository()
-	defer playerRepository.Close()
+	playerRepository := createPlayerRepository(db)
+
+	log.Trace("create session repository")
+	sessionRepository := createSessionRepository(db)
+
+	log.Trace("create new http client instance")
+	var client client.Client = client.NewHttpClient(
+		os.Getenv("SOKKER_USER"),
+		os.Getenv("SOKKER_PASS"),
+		sessionRepository,
+	)
 
 	log.Trace("create subcommands registry, register subcommands")
 	subCmdRegistry := subcommands.NewSubcommandRegistry()
@@ -64,15 +83,38 @@ func main() {
 	}
 }
 
-// createPlayerRepository returns new player.PlayerRepository instance
-func createPlayerRepository() player.PlayerRepository {
-	playerRepository := player.NewSqlitePlayerRepository("./bidder.db")
-	if err := playerRepository.Init(); err != nil {
+// openDbConnection opens sqlite db connection
+func openDbConnection(path string) (*sql.DB, error) {
+	log.Tracef("opening sqlite3 connection for: %s", path)
+	db, err := sql.Open("sqlite3", path)
+	if err != nil {
 		log.Error(err)
-		printError("Could not open player bid list database. Run with -v flag for more information")
+		return nil, fmt.Errorf("could not open sqlite db %s", path)
 	}
 
-	return playerRepository
+	return db, nil
+}
+
+// createPlayerRepository returns new initialized player.PlayerRepository instance
+func createPlayerRepository(db *sql.DB) player.PlayerRepository {
+	repo := player.NewSqlitePlayerRepository(db)
+	if err := repo.Init(); err != nil {
+		log.Error(err)
+		printError("Could not init player bid list database. Run with -v flag for more information")
+	}
+
+	return repo
+}
+
+// createSessionRepository returns new initialized session.SessionRepository instance
+func createSessionRepository(db *sql.DB) session.SessionRepository {
+	repo := session.NewSqliteSessionRepository(db)
+	if err := repo.Init(); err != nil {
+		log.Error(err)
+		printError("Could not init sessions database. Run with -v flag for more information")
+	}
+
+	return repo
 }
 
 // printError logs error message and exits program

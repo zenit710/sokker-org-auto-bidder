@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"sokker-org-auto-bidder/internal/repository/session"
 	"sokker-org-auto-bidder/tools"
 
 	log "github.com/sirupsen/logrus"
@@ -30,14 +31,18 @@ const (
 type httpClient struct {
 	user string
 	pass string
+	sessRepo session.SessionRepository
 	sessId string
 	auth bool
 }
 
 // NewHttpClient returns new HttpClient for sokker.org
-func NewHttpClient(user, pass string) *httpClient {
+func NewHttpClient(user, pass string, sessRepo session.SessionRepository) *httpClient {
 	log.Trace("creating new http client for sokker.org")
-	return &httpClient{user: user, pass: pass, auth: false, sessId: tools.String(26)}
+	c := &httpClient{user: user, pass: pass, auth: false, sessRepo: sessRepo}
+	c.resolveSessKey()
+	
+	return c
 }
 
 func (s *httpClient) Auth() (*clubInfoResponse, error) {
@@ -170,6 +175,28 @@ func (s *httpClient) makeRequest(url string, method string, body interface{}) (*
 	return http.DefaultClient.Do(req)
 }
 
+func (s *httpClient) resolveSessKey() {
+	log.Trace("resolve http session key")
+	dbKey, err := s.sessRepo.Get()
+	if err == nil {
+		log.Debug("use http session key from db")
+		s.sessId = dbKey
+		return
+	}
+
+	log.Warnf("could not get sess key from db (%v), new one will be generated", err)
+	s.createNewSessKey()
+}
+
+func (s* httpClient) createNewSessKey() {
+	log.Trace("generate new http sess key")
+	s.sessId = tools.String(26)
+	
+	log.Trace("save new http session key to the db")
+	if err := s.sessRepo.Save(s.sessId); err != nil {
+		log.Warnf("http session key could not be stored: %v", err)
+	}
+}
 
 // extractResponseObject parse response to interface{} 
 func extractResponseObject(res *http.Response, obj interface{}) (error) {

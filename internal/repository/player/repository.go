@@ -13,6 +13,4 @@ type PlayerRepository interface {
 	List() ([]*model.Player, error)
 	// Update updates player in bid list
 	Update(player *model.Player) error
-	// Close closes repository connection
-	Close()
 }

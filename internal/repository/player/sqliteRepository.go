@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"sokker-org-auto-bidder/internal/model"
+	"sokker-org-auto-bidder/tools"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,27 +17,13 @@ var _ PlayerRepository = &sqlitePlayerRepository{}
 
 // sqlitePlayerRepository handle sqlite connection for player bid list
 type sqlitePlayerRepository struct {
-	path string
 	db *sql.DB
 }
 
 // NewSqlitePlayerRepository returns new repository with sqlite connection
-func NewSqlitePlayerRepository(path string) *sqlitePlayerRepository {
+func NewSqlitePlayerRepository(db *sql.DB) *sqlitePlayerRepository {
 	log.Trace("creating new sqlite player repository")
-	return &sqlitePlayerRepository{path: path}
-}
-
-// OpenConnection opens sqlite db connection
-func (r *sqlitePlayerRepository) OpenConnection() error {
-	log.Tracef("opening sqlite3 connection for: %s", r.path)
-	db, err := sql.Open("sqlite3", r.path)
-	if err != nil {
-		log.Error(err)
-		return fmt.Errorf("could not open sqlite db %s", r.path)
-	}
-	r.db = db 
-
-	return nil
+	return &sqlitePlayerRepository{db}
 }
 
 // CreateSchema creates db structure if it is not created yet
@@ -59,12 +45,6 @@ func (r *sqlitePlayerRepository) CreateSchema() error {
 
 func (r *sqlitePlayerRepository) Init() error {
 	log.Trace("sqlite player repository init")
-	if err := r.OpenConnection(); err != nil {
-		log.Error(err)
-		return fmt.Errorf("could not open sqlite connection")
-	}
-	log.Debug("sqlite connection open")
-
 	if err := r.CreateSchema(); err != nil {
 		log.Error(err)
 		return fmt.Errorf("could not create schema for sqlite db")
@@ -76,7 +56,8 @@ func (r *sqlitePlayerRepository) Init() error {
 func (r *sqlitePlayerRepository) Add(player *model.Player) error {
 	log.Tracef("add player (%v) to the bid list", player)
 
-	return r.makeTransaction(
+	return tools.MakeTransaction(
+		r.db,
 		`insert into players (playerId, maxPrice, deadline) values(?, ?, datetime(?))`,
 		player.Id, player.MaxPrice, player.Deadline.Format(time.RFC3339),
 	)
@@ -85,7 +66,8 @@ func (r *sqlitePlayerRepository) Add(player *model.Player) error {
 func (r *sqlitePlayerRepository) Delete(player *model.Player) error {
 	log.Tracef("remove player (%d) from the bid list", player.Id)
 
-	return r.makeTransaction(
+	return tools.MakeTransaction(
+		r.db,
 		`delete from players where playerId = ?`,
 		player.Id,
 	)
@@ -131,47 +113,9 @@ func (r *sqlitePlayerRepository) List() ([]*model.Player, error) {
 func (r *sqlitePlayerRepository) Update(player *model.Player) error {
 	log.Tracef("update player (%d) on bid list", player.Id)
 
-	return r.makeTransaction(
+	return tools.MakeTransaction(
+		r.db,
 		`update players set maxPrice = ?, deadline = datetime(?) where playerId = ?`,
 		player.MaxPrice, player.Deadline.Format(time.RFC3339), player.Id,
 	)
-}
-
-func (r *sqlitePlayerRepository) Close() {
-	log.Debug("close db connection")
-	r.db.Close()
-}
-
-// makeTransaction handles DB transaction
-func (r *sqlitePlayerRepository) makeTransaction(sql string, params ...interface{}) error {
-	log.Trace("create db transaction")
-	tx, err := r.db.Begin()
-	if err != nil {
-		log.Error(err)
-		return fmt.Errorf("db transaction could not begin")
-	}
-
-	log.Trace("prepare sql statement")
-	stmt, err := tx.Prepare(sql)
-	if err != nil {
-		log.Error(err)
-		return fmt.Errorf("could not prepare sql statement: '%s'", sql)
-	}
-	defer stmt.Close()
-	
-	log.Trace("execute transaction")
-	_, err = stmt.Exec(params)
-	if err != nil {
-		log.Error(err)
-		return fmt.Errorf("sql '%s' execution with params (%v) failed", sql, params)
-	}
-
-	log.Trace("commit transaction")
-	err = tx.Commit()
-	if err != nil {
-		log.Error(err)
-		return fmt.Errorf("could not commit sql transaction")
-	}
-
-	return nil
 }
