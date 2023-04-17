@@ -7,6 +7,7 @@ import (
 	"sokker-org-auto-bidder/tools"
 	"time"
 
+	_ "github.com/mattn/go-sqlite3"
 	log "github.com/sirupsen/logrus"
 )
 

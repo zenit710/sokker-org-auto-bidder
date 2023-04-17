@@ -91,7 +91,7 @@ func (s*httpClient) ClubInfo() (*clubInfoResponse, error) {
 	return c, nil
 }
 
-func (s *httpClient) FetchPlayerInfo(id uint) (*playerInfoResponse ,error) {
+func (s *httpClient) FetchPlayerInfo(id uint) (*playerInfoResponse, error) {
 	log.Tracef("make player (%d) info request", id)
 	res, err := http.Get(fmt.Sprintf(urlPlayerInfoFormat, id))
 	if err != nil {
@@ -100,6 +100,9 @@ func (s *httpClient) FetchPlayerInfo(id uint) (*playerInfoResponse ,error) {
 	}
 
 	log.Debugf("fetch player (%d) info request http status code: %d", id, res.StatusCode)
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("player (%d) details can not be fetched", id)
+	}
 
 	log.Tracef("parse player (%d) info response", id)
 	p := &playerInfoResponse{}

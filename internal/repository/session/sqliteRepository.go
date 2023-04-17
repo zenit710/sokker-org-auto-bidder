@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"sokker-org-auto-bidder/tools"
-	"time"
 
+	_ "github.com/mattn/go-sqlite3"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -50,8 +50,8 @@ func (r *sqliteSessionRepository) Save(sess string) error {
 
 	return tools.MakeTransaction(
 		r.db,
-		`insert into sessions (key, created) values(?, datetime(?))`,
-		sess, time.Now().Format(time.RFC3339),
+		`insert into sessions (key, created) values(?, datetime('now'))`,
+		sess,
 	)
 }
 
@@ -59,7 +59,7 @@ func (r *sqliteSessionRepository) Save(sess string) error {
 func (r *sqliteSessionRepository) CreateSchema() error {
 	sqlStmt := `create table if not exists sessions (
 		id integer not null primary key autoincrement,
-		key string not null,
+		key text not null,
 		created text not null
 		);`
 

@@ -25,7 +25,7 @@ func MakeTransaction(db *sql.DB, sql string, params ...interface{}) error {
 	defer stmt.Close()
 	
 	log.Trace("execute transaction")
-	_, err = stmt.Exec(params)
+	_, err = stmt.Exec(params...)
 	if err != nil {
 		log.Error(err)
 		return fmt.Errorf("sql '%s' execution with params (%v) failed", sql, params)

@@ -66,7 +66,7 @@ You can build app after changes using `make`. `soab` executable will be built in
 ## TODO
 
 - log debug/info/warning/errors to the file: https://gist.github.com/huobazi/80805158fe1f2cac7170fe68c37741ab
-- do not generate new phpsessid everytime, store it for some time (SOMETHINGS WRONG HERE, CANNOT SAVE TO THE DB: `./soab -v check-auth`)
+- test all cases after db logic change
 - write unit tests
 - bid subcommand:
   - handle no funds for bid
