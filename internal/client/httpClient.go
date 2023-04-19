@@ -120,7 +120,7 @@ func (s *httpClient) Bid(id, price uint) (*transferInfoResponse, error) {
 	body := &bidReqBody{Value: price}
 	bidUrl := fmt.Sprintf(urlPlayerBidFormat, id)
 
-	log.Tracef("make player (%d) bid request")
+	log.Tracef("make player (%d) bid request", id)
 	res, err := s.makeRequest(bidUrl, http.MethodPut, body)
 	if err != nil {
 		log.Error(err)
