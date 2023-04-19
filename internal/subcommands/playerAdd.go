@@ -13,14 +13,14 @@ import (
 )
 
 var (
-	_ Subcommand = &playerAddSubcommand{}
-	requiredFlags = []string{"playerId", "maxPrice"}
+	_             Subcommand = &playerAddSubcommand{}
+	requiredFlags            = []string{"playerId", "maxPrice"}
 )
 
 // playerAddSubcommand handle player add command
 type playerAddSubcommand struct {
-	c client.Client
-	r player.PlayerRepository
+	c  client.Client
+	r  player.PlayerRepository
 	fs *flag.FlagSet
 
 	playerId uint
@@ -31,8 +31,8 @@ type playerAddSubcommand struct {
 func NewPlayerAddSubcommand(r player.PlayerRepository, c client.Client) *playerAddSubcommand {
 	log.Trace("creating new player add subcommand handler")
 	cmd := &playerAddSubcommand{
-		c: c,
-		r: r,
+		c:  c,
+		r:  r,
 		fs: flag.NewFlagSet("add", flag.ExitOnError),
 	}
 
@@ -90,7 +90,7 @@ func (s *playerAddSubcommand) Run() error {
 
 	log.Tracef("map player (%d) from response to player model", s.playerId)
 	player := &model.Player{
-		Id: s.playerId,
+		Id:       s.playerId,
 		MaxPrice: s.maxPrice,
 		Deadline: dt.In(time.UTC),
 	}

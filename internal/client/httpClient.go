@@ -29,11 +29,11 @@ const (
 
 // httpClient handles connection with sokker API through http
 type httpClient struct {
-	user string
-	pass string
+	user     string
+	pass     string
 	sessRepo session.SessionRepository
-	sessId string
-	auth bool
+	sessId   string
+	auth     bool
 }
 
 // NewHttpClient returns new HttpClient for sokker.org
@@ -41,7 +41,7 @@ func NewHttpClient(user, pass string, sessRepo session.SessionRepository) *httpC
 	log.Trace("creating new http client for sokker.org")
 	c := &httpClient{user: user, pass: pass, auth: false, sessRepo: sessRepo}
 	c.resolveSessKey()
-	
+
 	return c
 }
 
@@ -67,7 +67,7 @@ func (s *httpClient) Auth() (*clubInfoResponse, error) {
 	return s.ClubInfo()
 }
 
-func (s*httpClient) ClubInfo() (*clubInfoResponse, error) {
+func (s *httpClient) ClubInfo() (*clubInfoResponse, error) {
 	log.Trace("make club info request")
 	res, err := s.makeRequest(urlClubInfo, http.MethodGet, nil)
 	if err != nil {
@@ -153,7 +153,7 @@ PHPSESSID cookie is passed with this request.
 */
 func (s *httpClient) makeRequest(url string, method string, body interface{}) (*http.Response, error) {
 	var bodyReader io.Reader = nil
-	
+
 	if body != nil {
 		log.Trace("request has body to send, convert to json")
 		jsonBody, err := json.Marshal(body)
@@ -191,18 +191,18 @@ func (s *httpClient) resolveSessKey() {
 	s.createNewSessKey()
 }
 
-func (s* httpClient) createNewSessKey() {
+func (s *httpClient) createNewSessKey() {
 	log.Trace("generate new http sess key")
 	s.sessId = tools.String(26)
-	
+
 	log.Trace("save new http session key to the db")
 	if err := s.sessRepo.Save(s.sessId); err != nil {
 		log.Warnf("http session key could not be stored: %v", err)
 	}
 }
 
-// extractResponseObject parse response to interface{} 
-func extractResponseObject(res *http.Response, obj interface{}) (error) {
+// extractResponseObject parse response to interface{}
+func extractResponseObject(res *http.Response, obj interface{}) error {
 	log.Trace("read http response body")
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {

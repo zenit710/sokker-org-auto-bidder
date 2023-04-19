@@ -4,7 +4,7 @@ import "time"
 
 // Player is a struct for player in bid list
 type Player struct {
-	Id uint
+	Id       uint
 	MaxPrice uint
 	Deadline time.Time
 }

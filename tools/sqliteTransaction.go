@@ -23,7 +23,7 @@ func MakeTransaction(db *sql.DB, sql string, params ...interface{}) error {
 		return fmt.Errorf("could not prepare sql statement: '%s'", sql)
 	}
 	defer stmt.Close()
-	
+
 	log.Trace("execute transaction")
 	_, err = stmt.Exec(params...)
 	if err != nil {

@@ -33,7 +33,7 @@ func (r *mockPlayerRepository) Delete(player *model.Player) error {
 
 func (r *mockPlayerRepository) List() ([]*model.Player, error) {
 	args := r.Called()
-	return args.Get(0).([]*model.Player),args.Error(1)
+	return args.Get(0).([]*model.Player), args.Error(1)
 }
 
 func (r *mockPlayerRepository) Update(player *model.Player) error {

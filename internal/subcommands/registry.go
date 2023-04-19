@@ -32,11 +32,12 @@ func (s *subcommandRegistry) Run(name string, args []string) error {
 	if cmd == nil {
 		return &ErrSubcommandNotAvailable{Name: name, Available: s.GetSubcommandNames()}
 	}
-	
+
 	log.Debugf("'%s' subcommand init with args %v", name, args)
 	if err := cmd.Init(args); err != nil {
 		switch err.(type) {
-		case *ErrMissingFlags: return err
+		case *ErrMissingFlags:
+			return err
 		default:
 			log.Error(err)
 			return fmt.Errorf("'%s' subcommand initialization failed", name)
@@ -63,7 +64,7 @@ func (s *subcommandRegistry) GetSubcommandNames() []string {
 
 // ErrSubcommandNotAvailable is raised when registry has no subcommand registere on provided name key
 type ErrSubcommandNotAvailable struct {
-	Name string
+	Name      string
 	Available []string
 }
 

@@ -42,6 +42,6 @@ func (s *checkAuthSubcommand) Run() error {
 	} else {
 		fmt.Printf("Auth success! Club ID: %d\n", club.Team.Id)
 	}
-	
+
 	return nil
 }

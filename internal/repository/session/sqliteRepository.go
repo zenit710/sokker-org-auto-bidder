@@ -25,7 +25,7 @@ func NewSqliteSessionRepository(db *sql.DB) *sqliteSessionRepository {
 func (r *sqliteSessionRepository) Get() (string, error) {
 	log.Trace("get newest session key")
 	key := ""
-	
+
 	row := r.db.QueryRow(`select key from sessions order by id desc`)
 	if err := row.Scan(&key); err != nil {
 		log.Error(err)

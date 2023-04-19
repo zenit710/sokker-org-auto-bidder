@@ -6,7 +6,7 @@ const TimeLayout = "2006-01-02 15:04:05"
 // loginReqBody represents request body sent to auth endpoint
 type loginReqBody struct {
 	Login string `json:"login"`
-	Pass string `json:"password"`
+	Pass  string `json:"password"`
 }
 
 // bidReqBody represents request body sent to bid endpoint
@@ -23,7 +23,7 @@ type bidState struct {
 type playerInfoResponse struct {
 	Transfer struct {
 		Deadline struct {
-			Date string
+			Date     string
 			Timezone string
 		}
 		Price struct {
@@ -37,7 +37,7 @@ type playerInfoResponse struct {
 type transferInfoResponse struct {
 	Deadline struct {
 		Date struct {
-			Date string
+			Date     string
 			Timezone string
 		}
 	}

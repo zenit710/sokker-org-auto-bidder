@@ -75,7 +75,8 @@ func main() {
 	log.Trace("execute subcommand")
 	if err := subCmdRegistry.Run(subcommand, subcommandArgs); err != nil {
 		switch err.(type) {
-		case *subcommands.ErrMissingFlags: printError(fmt.Sprintf("Bad input: %v", err))
+		case *subcommands.ErrMissingFlags:
+			printError(fmt.Sprintf("Bad input: %v", err))
 		default:
 			log.Error(err)
 			printError("Command execution failed. Run with -v flag for more information")
@@ -125,8 +126,14 @@ func printError(msg string) {
 
 // getLogLevel returns log level on command flags base
 func getLogLevel() log.Level {
-	if logTraceLvl {return log.TraceLevel}
-	if logDebugLvl {return log.DebugLevel}
-	if logWarnLvl {return log.WarnLevel}
+	if logTraceLvl {
+		return log.TraceLevel
+	}
+	if logDebugLvl {
+		return log.DebugLevel
+	}
+	if logWarnLvl {
+		return log.WarnLevel
+	}
 	return log.PanicLevel
 }
