@@ -19,9 +19,9 @@ type stringWithCharsetTest struct {
 }
 
 var stringWithCharsetTests = []stringWithCharsetTest{
-	stringWithCharsetTest{"AB", 10},
-	stringWithCharsetTest{"12", 20},
-	stringWithCharsetTest{"AB12ab", 30},
+	{"AB", 10},
+	{"12", 20},
+	{"AB12ab", 30},
 }
 
 func sliceIncludes(slice []rune, char rune) bool {
@@ -34,9 +34,8 @@ func sliceIncludes(slice []rune, char rune) bool {
 }
 
 func getUniqueChars(s string) []rune {
-	chars := []rune(s)
 	uniqueChars := []rune{}
-	for	_, c := range chars {
+	for	_, c := range s {
 		if !sliceIncludes(uniqueChars, c) {
 			uniqueChars = append(uniqueChars, c)
 		}
