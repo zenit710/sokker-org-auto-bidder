@@ -15,7 +15,7 @@ func TestString(t *testing.T) {
 
 type stringWithCharsetTest struct {
 	charset string
-	length int
+	length  int
 }
 
 var stringWithCharsetTests = []stringWithCharsetTest{
@@ -35,7 +35,7 @@ func sliceIncludes(slice []rune, char rune) bool {
 
 func getUniqueChars(s string) []rune {
 	uniqueChars := []rune{}
-	for	_, c := range s {
+	for _, c := range s {
 		if !sliceIncludes(uniqueChars, c) {
 			uniqueChars = append(uniqueChars, c)
 		}
@@ -76,7 +76,7 @@ func TestStringWithCharset(t *testing.T) {
 		if strlen := len(s); strlen != test.length {
 			t.Errorf("Generated string length %d not equal to asked %d", strlen, test.length)
 		}
-		
+
 		usedChars := getUniqueChars(s)
 		askedChars := getUniqueChars(test.charset)
 		if !compareSlices(usedChars, askedChars) {
