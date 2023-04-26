@@ -32,7 +32,7 @@ func TestRegisterSubcommand(t *testing.T) {
 	}
 	if !sFound {
 		t.Error("registered 'test' subcommand not found in registry")
-	}	
+	}
 }
 
 func TestRegisterSubcommandOverwrite(t *testing.T) {
@@ -74,7 +74,7 @@ func TestRunMissingExecFlags(t *testing.T) {
 	s.On("Init", args).Return(expectedErr)
 	r := subcommands.NewSubcommandRegistry()
 	r.Register("test", s)
-	
+
 	err := r.Run("test", args)
 	if err == nil || !errors.As(err, &expectedErr) {
 		t.Errorf("expected '%T' but '%T' returned", expectedErr, err)
@@ -87,7 +87,7 @@ func TestRunSubcommandInitFailed(t *testing.T) {
 	s.On("Init", args).Return(errors.New("error"))
 	r := subcommands.NewSubcommandRegistry()
 	r.Register("test", s)
-	
+
 	err := r.Run("test", args)
 	if err == nil || !errors.Is(err, subcommands.ErrSubcommandInitFailed) {
 		t.Errorf("expected '%v' but '%v' returned", subcommands.ErrSubcommandInitFailed, err)
@@ -102,7 +102,7 @@ func TestRunSubcommandRunFailed(t *testing.T) {
 	s.On("Run").Return(expectedErr)
 	r := subcommands.NewSubcommandRegistry()
 	r.Register("test", s)
-	
+
 	err := r.Run("test", args)
 	if err == nil || !errors.Is(err, expectedErr) {
 		t.Errorf("expected '%v' but '%v' returned", expectedErr, err)
@@ -123,7 +123,7 @@ func TestRunExistingSubcommandWithSuccess(t *testing.T) {
 }
 
 type subcommandNamesTest struct {
-	names []string
+	names         []string
 	expectedCount int
 }
 
