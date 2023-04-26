@@ -1,10 +1,13 @@
 package subcommands
 
 import (
+	"errors"
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
 )
+
+var ErrSubcommandInitFailed = errors.New("subcommand init failed")
 
 // subcommandRegistry manage available commands
 type subcommandRegistry struct {
@@ -40,7 +43,7 @@ func (s *subcommandRegistry) Run(name string, args []string) error {
 			return err
 		default:
 			log.Error(err)
-			return fmt.Errorf("'%s' subcommand initialization failed", name)
+			return ErrSubcommandInitFailed
 		}
 	}
 
