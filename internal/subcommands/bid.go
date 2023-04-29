@@ -1,6 +1,7 @@
 package subcommands
 
 import (
+	"errors"
 	"fmt"
 	"sokker-org-auto-bidder/internal/client"
 	"sokker-org-auto-bidder/internal/model"
@@ -11,7 +12,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var _ Subcommand = &bidSubcommand{}
+var (
+	_                       Subcommand = &bidSubcommand{}
+	ErrDbFetchPlayersFailed            = errors.New("could not fetch players to bid")
+	ErrApiAuthFailed                   = errors.New("authorization error")
+)
 
 // bidSubcommand handle player bid action
 type bidSubcommand struct {
@@ -38,7 +43,7 @@ func (s *bidSubcommand) Run() error {
 	players, err := s.r.List()
 	if err != nil {
 		log.Error(err)
-		return fmt.Errorf("could not fetch players to bid")
+		return ErrDbFetchPlayersFailed
 	}
 	log.Debugf("%d players for bid", len(players))
 
@@ -46,7 +51,7 @@ func (s *bidSubcommand) Run() error {
 	club, err := s.c.Auth()
 	if err != nil {
 		log.Error(err)
-		return fmt.Errorf("authorization error")
+		return ErrApiAuthFailed
 	}
 
 	log.Debug("make players bids")

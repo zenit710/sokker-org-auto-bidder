@@ -12,6 +12,10 @@ func NewMockClient() *mockClient {
 	return &mockClient{}
 }
 
+func (c *mockClient) GetEmptyClubInfoResponse() *clubInfoResponse {
+	return &clubInfoResponse{}
+}
+
 func (c *mockClient) Auth() (*clubInfoResponse, error) {
 	args := c.Called()
 	return args.Get(0).(*clubInfoResponse), args.Error(1)
