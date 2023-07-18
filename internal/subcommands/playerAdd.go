@@ -66,26 +66,26 @@ func (s *playerAddSubcommand) Init(args []string) error {
 }
 
 // Run executes command and add player to the bid list eventually
-func (s *playerAddSubcommand) Run() error {
+func (s *playerAddSubcommand) Run() (interface{}, error) {
 	log.Tracef("execute player (%d) add subcommand", s.playerId)
 
 	log.Debugf("fetch info about player (%d)", s.playerId)
 	info, err := s.c.FetchPlayerInfo(s.playerId)
 	if err != nil {
 		log.Error(err)
-		return fmt.Errorf("could not fetch player (%d) transfer details", s.playerId)
+		return nil, fmt.Errorf("could not fetch player (%d) transfer details", s.playerId)
 	}
 
 	log.Tracef("check can make player (%d) bid (max price vs current price)", s.playerId)
 	if s.maxPrice < info.Transfer.Price.MinBid.Value {
-		return fmt.Errorf("minimum price for player (%d) is %d", s.playerId, info.Transfer.Price.MinBid.Value)
+		return nil, fmt.Errorf("minimum price for player (%d) is %d", s.playerId, info.Transfer.Price.MinBid.Value)
 	}
 
 	log.Tracef("parse player (%d) transfer deadline time", s.playerId)
 	dt, err := tools.TimeInZone(client.TimeLayout, info.Transfer.Deadline.Date, info.Transfer.Deadline.Timezone)
 	if err != nil {
 		log.Error(err)
-		return fmt.Errorf("could not parse player (%d) transfer deadlin time", s.playerId)
+		return nil, fmt.Errorf("could not parse player (%d) transfer deadlin time", s.playerId)
 	}
 
 	log.Tracef("map player (%d) from response to player model", s.playerId)
@@ -98,18 +98,18 @@ func (s *playerAddSubcommand) Run() error {
 	log.Tracef("validate player (%d) model before save", s.playerId)
 	if err := player.Validate(); err != nil {
 		log.Error(err)
-		return err
+		return nil, err
 	}
 
 	log.Debugf("add player (%d) to the bid list", s.playerId)
 	if err := s.r.Add(player); err != nil {
 		log.Error(err)
-		return fmt.Errorf("player (%d) could not be added to the bid list", s.playerId)
+		return nil, fmt.Errorf("player (%d) could not be added to the bid list", s.playerId)
 	}
 
 	fmt.Printf("player (%d) added to bid list: %v\n", s.playerId, player)
 
-	return nil
+	return nil, nil
 }
 
 func stringSliceContains(slice []string, search string) bool {

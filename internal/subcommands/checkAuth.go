@@ -27,14 +27,14 @@ func (s *checkAuthSubcommand) Init(args []string) error {
 }
 
 // Run executes subcommand
-func (s *checkAuthSubcommand) Run() error {
+func (s *checkAuthSubcommand) Run() (interface{}, error) {
 	log.Trace("execute check auth subcommand")
 
 	log.Debug("auth in sokker.org")
 	club, err := s.c.Auth()
 	if err != nil && !errors.Is(err, client.ErrBadCredentials) {
 		log.Error(err)
-		return fmt.Errorf("authorization error")
+		return nil, fmt.Errorf("authorization error")
 	}
 
 	if club == nil {
@@ -43,5 +43,5 @@ func (s *checkAuthSubcommand) Run() error {
 		fmt.Printf("Auth success! Club ID: %d\n", club.Team.Id)
 	}
 
-	return nil
+	return nil, nil
 }

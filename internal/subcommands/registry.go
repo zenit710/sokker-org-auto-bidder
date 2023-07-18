@@ -48,7 +48,8 @@ func (s *subcommandRegistry) Run(name string, args []string) error {
 	}
 
 	log.Debugf("'%s' subcommand run", name)
-	return cmd.Run()
+	_, err := cmd.Run()
+	return err
 }
 
 // GetSubcommandNames returns key names of all registered subcommands

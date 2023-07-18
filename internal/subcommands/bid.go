@@ -36,14 +36,14 @@ func (s *bidSubcommand) Init(args []string) error {
 }
 
 // Run executes bid subcommand
-func (s *bidSubcommand) Run() error {
+func (s *bidSubcommand) Run() (interface{}, error) {
 	log.Trace("make bid for listed players")
 
 	log.Debug("fetch players to bid")
 	players, err := s.r.List()
 	if err != nil {
 		log.Error(err)
-		return ErrDbFetchPlayersFailed
+		return nil, ErrDbFetchPlayersFailed
 	}
 	log.Debugf("%d players for bid", len(players))
 
@@ -51,7 +51,7 @@ func (s *bidSubcommand) Run() error {
 	club, err := s.c.Auth()
 	if err != nil {
 		log.Error(err)
-		return ErrApiAuthFailed
+		return nil, ErrApiAuthFailed
 	}
 
 	log.Debug("make players bids")
@@ -64,7 +64,7 @@ func (s *bidSubcommand) Run() error {
 		}
 	}
 
-	return nil
+	return nil, nil
 }
 
 // handlePlayer handle player bid process

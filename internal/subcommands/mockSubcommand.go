@@ -17,7 +17,7 @@ func (s *mockSubcommand) Init(cmdArgs []string) error {
 	return args.Error(0)
 }
 
-func (s *mockSubcommand) Run() error {
+func (s *mockSubcommand) Run() (interface{}, error) {
 	args := s.Called()
-	return args.Error(0)
+	return args.Get(0), args.Error(1)
 }

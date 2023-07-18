@@ -99,7 +99,7 @@ func TestRunSubcommandRunFailed(t *testing.T) {
 	args := []string{}
 	s := subcommands.NewMockSubcommand()
 	s.On("Init", args).Return(nil)
-	s.On("Run").Return(expectedErr)
+	s.On("Run").Return(nil, expectedErr)
 	r := subcommands.NewSubcommandRegistry()
 	r.Register("test", s)
 
@@ -113,7 +113,7 @@ func TestRunExistingSubcommandWithSuccess(t *testing.T) {
 	args := []string{}
 	s := subcommands.NewMockSubcommand()
 	s.On("Init", args).Return(nil)
-	s.On("Run").Return(nil)
+	s.On("Run").Return(nil, nil)
 	r := subcommands.NewSubcommandRegistry()
 	r.Register("test", s)
 	err := r.Run("test", args)

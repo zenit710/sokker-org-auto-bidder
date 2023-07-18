@@ -34,7 +34,7 @@ func TestRunDbFetchFailure(t *testing.T) {
 	r.On("List").Return([]*model.Player{}, errors.New("error"))
 	c := client.NewMockClient()
 	s := NewBidSubcommand(r, c)
-	err := s.Run()
+	_, err := s.Run()
 	if err == nil || !errors.Is(err, ErrDbFetchPlayersFailed) {
 		t.Errorf("'%v' expected, '%v' returned", ErrDbFetchPlayersFailed, err)
 	}
@@ -46,7 +46,7 @@ func TestRunApiAuthFailure(t *testing.T) {
 	c := client.NewMockClient()
 	c.On("Auth").Return(c.GetEmptyClubInfoResponse(), errors.New("error"))
 	s := NewBidSubcommand(r, c)
-	err := s.Run()
+	_, err := s.Run()
 	if err == nil || !errors.Is(err, ErrApiAuthFailed) {
 		t.Errorf("'%v' expected, '%v' returned", ErrApiAuthFailed, err)
 	}
@@ -58,7 +58,7 @@ func TestRunNoListedPlayers(t *testing.T) {
 	c := client.NewMockClient()
 	c.On("Auth").Return(c.GetEmptyClubInfoResponse(), nil)
 	s := NewBidSubcommand(r, c)
-	err := s.Run()
+	_, err := s.Run()
 	if err != nil {
 		t.Errorf("nil error expected, '%v' returned", err)
 	}
