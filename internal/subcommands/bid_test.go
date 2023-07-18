@@ -64,5 +64,41 @@ func TestRunNoListedPlayers(t *testing.T) {
 	}
 }
 
+// type bidRunOutputTest struct {
+// 	players []*model.Player
+// 	failingIds []uint
+// }
+
+// var bidRunOutputTests =  []*bidRunOutputTest{
+// 	{[]*model.Player{}, []uint{}},
+// 	{[]*model.Player{
+// 		{Id: 1},
+// 	}, []uint{}},
+// 	{[]*model.Player{
+// 		{Id: 1},
+// 	}, []uint{1}},
+// 	{[]*model.Player{
+// 		{Id: 1},
+// 	}, []uint{2}},
+// }
+
+// func TestRunPlayerBidResults(t *testing.T) {
+// 	r := player.NewMockPlayerRepository()
+// 	c := client.NewMockClient()
+// 	c.On("Auth").Return(c.GetEmptyClubInfoResponse(), nil)
+
+// 	for _, tc := range bidRunOutputTests {
+// 		r.On("List").Return(tc.players, nil)
+// 		// mock errors from handlePlayer()
+// 		// chceck every error from this method
+// 		// maybe we need to extend bidRunOutputTest struct with errors for each playerID
+// 		s := NewBidSubcommand(r, c)
+// 		output, err := s.Run()
+// 		if err != nil {
+// 			t.Errorf("nil error expected, '%v' returned", err)
+// 		}
+// 	}
+// }
+
 // test run with player handling E2E
 // test player handle errors
