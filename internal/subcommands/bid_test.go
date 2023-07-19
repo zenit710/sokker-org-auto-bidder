@@ -7,8 +7,6 @@ import (
 	"sokker-org-auto-bidder/internal/repository/player"
 	playerbid "sokker-org-auto-bidder/internal/service/player-bid"
 	"testing"
-
-	"github.com/stretchr/testify/mock"
 )
 
 func createBidSubcommand() (*player.MockPlayerRepository, *client.MockClient, *playerbid.MockPlayerBidService, *bidSubcommand) {
@@ -42,7 +40,6 @@ func TestRunDbFetchFailure(t *testing.T) {
 	}
 }
 
-
 func TestRunApiAuthFailure(t *testing.T) {
 	r, c, _, s := createBidSubcommand()
 	r.On("List").Return([]*model.Player{}, nil)
@@ -64,49 +61,49 @@ func TestRunNoListedPlayers(t *testing.T) {
 }
 
 type bidRunOutputTest struct {
-	players []*model.Player
-	failingPlayers []*model.Player
-	success uint
-	failed uint
+	success []*model.Player
+	failing []*model.Player
 }
 
 var (
-	p1 = &model.Player{Id: 1}
-	p2 = &model.Player{Id: 2}
-	bidRunOutputTests =  []*bidRunOutputTest{
-		{[]*model.Player{}, []*model.Player{}, 0, 0},
-		{[]*model.Player{p1}, []*model.Player{}, 1, 0},
-		{[]*model.Player{p1}, []*model.Player{p1}, 0, 1},
-		{[]*model.Player{p1, p2}, []*model.Player{p1}, 1, 1},
+	p1                = &model.Player{Id: 1}
+	p2                = &model.Player{Id: 2}
+	bidRunOutputTests = []*bidRunOutputTest{
+		{[]*model.Player{}, []*model.Player{}},
+		{[]*model.Player{p1}, []*model.Player{}},
+		{[]*model.Player{}, []*model.Player{p1}},
+		{[]*model.Player{p1}, []*model.Player{p2}},
 	}
 )
 
 func TestRunPlayerBidResults(t *testing.T) {
 	r, c, b, s := createBidSubcommand()
 	c.On("Auth").Return(c.GetEmptyClubInfoResponse(), nil)
-	// TODO mocking anything causes failing tests
-	// find a way to mock every player
-	// maybe create arrays not for all and falling but succesfull and falling separately
-	b.On("Bid", mock.Anything, mock.Anything).Return(nil)
 
 	for _, tc := range bidRunOutputTests {
-		r.On("List").Once().Return(tc.players, nil)
+		all := append(tc.success, tc.failing...)
+		successCount := len(tc.success)
+		failingCount := len(tc.failing)
+		r.On("List").Once().Return(all, nil)
 
-		for _, p := range tc.failingPlayers {
-			b.On("Bid", p, 0).Once().Return()
+		for _, p := range tc.failing {
+			b.On("Bid", p, uint(0)).Once().Return(&playerbid.ErrCouldNotBid{})
 		}
-		
+		for _, p := range tc.success {
+			b.On("Bid", p, uint(0)).Once().Return(nil)
+		}
+
 		output, err := s.Run()
 		if err != nil {
 			t.Errorf("nil error expected, '%v' returned", err)
 		}
-		
+
 		bidOutput := output.(BidSubcommandOutput)
-		if bidOutput.Ok != tc.success {
-			t.Errorf("'%d' successful bids expected, '%d' returned", tc.success, bidOutput.Ok)
+		if bidOutput.Ok != uint(successCount) {
+			t.Errorf("'%d' successful bids expected, '%d' returned", successCount, bidOutput.Ok)
 		}
-		if bidOutput.Failed != tc.failed {
-			t.Errorf("'%d' failed bids expected, '%d' returned", tc.failed, bidOutput.Failed)
+		if bidOutput.Failed != uint(failingCount) {
+			t.Errorf("'%d' failed bids expected, '%d' returned", failingCount, bidOutput.Failed)
 		}
 	}
 }

@@ -28,7 +28,7 @@ func (e *ErrCurrentLeader) Error() string {
 
 type ErrCouldNotBid struct {
 	id uint
-	e error
+	e  error
 }
 
 func (e *ErrCouldNotBid) Error() string {

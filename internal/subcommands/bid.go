@@ -59,10 +59,10 @@ func (s *bidSubcommand) Run() (interface{}, error) {
 		err := s.b.Bid(player, club.Team.Id)
 		if err != nil {
 			fmt.Printf("player (%d): %v\n", player.Id, err)
-			output.Ok++
+			output.Failed++
 		} else {
 			fmt.Printf("player (%d): bid made\n", player.Id)
-			output.Failed++
+			output.Ok++
 		}
 	}
 
