@@ -8,11 +8,13 @@ type MockClient struct {
 	mock.Mock
 }
 
-func (c *MockClient) GetEmptyClubInfoResponse(id uint) *clubInfoResponse {
+// GetClubInfoResponse returnes mocked clubInfoResponse struct
+func (c *MockClient) GetClubInfoResponse(id uint) *clubInfoResponse {
 	return &clubInfoResponse{Team: team{id}}
 }
 
-func (c *MockClient) GetEmptyPlayerInfoResponse(deadlineDate string, minBid uint, buyerId uint) *playerInfoResponse {
+// GetPlayerInfoResponse returnes mocked playerInfoResponse struct
+func (c *MockClient) GetPlayerInfoResponse(deadlineDate string, minBid uint, buyerId uint) *playerInfoResponse {
 	return &playerInfoResponse{
 		Transfer: transfer{
 			Deadline: playerInfoDeadline{
@@ -24,6 +26,25 @@ func (c *MockClient) GetEmptyPlayerInfoResponse(deadlineDate string, minBid uint
 				},
 			},
 			BuyerId: buyerId,
+		},
+	}
+}
+
+// GetTransferInfoResponse returnes mocked transferInfoResponse struct
+func (c *MockClient) GetTransferInfoResponse(deadline string, minBid, buyerId uint) *transferInfoResponse {
+	return &transferInfoResponse{
+		Deadline: transferInfoDeadline{
+			Date: date{
+				Date: deadline,
+			},
+		},
+		Price: price{
+			MinBid: bidState{
+				Value: minBid,
+			},
+		},
+		Buyer: buyer{
+			Id: buyerId,
 		},
 	}
 }

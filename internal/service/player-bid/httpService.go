@@ -61,7 +61,6 @@ func (s *httpPlayerBidService) Bid(p *model.Player, clubId uint) error {
 	newDeadline, err := tools.TimeInZone(client.TimeLayout, tr.Deadline.Date.Date, tr.Deadline.Date.Timezone)
 	if err != nil {
 		log.Error(err)
-		return &ErrDeadlineParse{p.Id}
 	}
 
 	log.Tracef("check is player (%d) transfer deadline still valid", p.Id)
@@ -71,7 +70,6 @@ func (s *httpPlayerBidService) Bid(p *model.Player, clubId uint) error {
 		log.Debugf("update player (%d) transfer deadline", p.Id)
 		if err = s.r.Update(p); err != nil {
 			log.Error(err)
-			return &ErrDeadlineNotUpdated{p.Id}
 		}
 	}
 

@@ -34,19 +34,3 @@ type ErrCouldNotBid struct {
 func (e *ErrCouldNotBid) Error() string {
 	return fmt.Sprintf("player (%d) bid could not be made: %v", e.id, e.e)
 }
-
-type ErrDeadlineParse struct {
-	id uint
-}
-
-func (e *ErrDeadlineParse) Error() string {
-	return fmt.Sprintf("could not parse player (%d) transfer deadline time", e.id)
-}
-
-type ErrDeadlineNotUpdated struct {
-	id uint
-}
-
-func (e *ErrDeadlineNotUpdated) Error() string {
-	return fmt.Sprintf("player (%d) transfer deadline was not updated, it can lead to mistakes, sorry", e.id)
-}
