@@ -17,7 +17,7 @@ func TestNewsSubcommandRegistryCreation(t *testing.T) {
 
 func TestRegisterSubcommand(t *testing.T) {
 	r := subcommands.NewSubcommandRegistry()
-	r.Register("test", subcommands.NewMockSubcommand())
+	r.Register("test", &subcommands.MockSubcommand{})
 	sMap := reflect.ValueOf(r).Elem().FieldByName("m")
 	if sMap.Kind() != reflect.Map {
 		t.Fatalf("subcommand registry m field should be subcommand map")
@@ -36,8 +36,8 @@ func TestRegisterSubcommand(t *testing.T) {
 }
 
 func TestRegisterSubcommandOverwrite(t *testing.T) {
-	s1 := subcommands.NewMockSubcommand()
-	s2 := subcommands.NewMockSubcommand()
+	s1 := &subcommands.MockSubcommand{}
+	s2 := &subcommands.MockSubcommand{}
 	s2Addr := uintptr(unsafe.Pointer(s2))
 	r := subcommands.NewSubcommandRegistry()
 	r.Register("test", s1)
@@ -70,7 +70,7 @@ func TestRunNotExistingSubcommand(t *testing.T) {
 func TestRunMissingExecFlags(t *testing.T) {
 	expectedErr := &subcommands.ErrMissingFlags{}
 	args := []string{}
-	s := subcommands.NewMockSubcommand()
+	s := &subcommands.MockSubcommand{}
 	s.On("Init", args).Return(expectedErr)
 	r := subcommands.NewSubcommandRegistry()
 	r.Register("test", s)
@@ -83,7 +83,7 @@ func TestRunMissingExecFlags(t *testing.T) {
 
 func TestRunSubcommandInitFailed(t *testing.T) {
 	args := []string{}
-	s := subcommands.NewMockSubcommand()
+	s := &subcommands.MockSubcommand{}
 	s.On("Init", args).Return(errors.New("error"))
 	r := subcommands.NewSubcommandRegistry()
 	r.Register("test", s)
@@ -97,7 +97,7 @@ func TestRunSubcommandInitFailed(t *testing.T) {
 func TestRunSubcommandRunFailed(t *testing.T) {
 	expectedErr := errors.New("error")
 	args := []string{}
-	s := subcommands.NewMockSubcommand()
+	s := &subcommands.MockSubcommand{}
 	s.On("Init", args).Return(nil)
 	s.On("Run").Return(nil, expectedErr)
 	r := subcommands.NewSubcommandRegistry()
@@ -111,7 +111,7 @@ func TestRunSubcommandRunFailed(t *testing.T) {
 
 func TestRunExistingSubcommandWithSuccess(t *testing.T) {
 	args := []string{}
-	s := subcommands.NewMockSubcommand()
+	s := &subcommands.MockSubcommand{}
 	s.On("Init", args).Return(nil)
 	s.On("Run").Return(nil, nil)
 	r := subcommands.NewSubcommandRegistry()
@@ -138,7 +138,7 @@ func TestGetSubcommandNames(t *testing.T) {
 	for i, test := range subcommandNamesTests {
 		r := subcommands.NewSubcommandRegistry()
 		for _, name := range test.names {
-			r.Register(name, subcommands.NewMockSubcommand())
+			r.Register(name, &subcommands.MockSubcommand{})
 		}
 
 		rNames := r.GetSubcommandNames()

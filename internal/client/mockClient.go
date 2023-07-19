@@ -2,36 +2,32 @@ package client
 
 import "github.com/stretchr/testify/mock"
 
-var _ Client = &mockClient{}
+var _ Client = &MockClient{}
 
-type mockClient struct {
+type MockClient struct {
 	mock.Mock
 }
 
-func NewMockClient() *mockClient {
-	return &mockClient{}
-}
-
-func (c *mockClient) GetEmptyClubInfoResponse() *clubInfoResponse {
+func (c *MockClient) GetEmptyClubInfoResponse() *clubInfoResponse {
 	return &clubInfoResponse{}
 }
 
-func (c *mockClient) Auth() (*clubInfoResponse, error) {
+func (c *MockClient) Auth() (*clubInfoResponse, error) {
 	args := c.Called()
 	return args.Get(0).(*clubInfoResponse), args.Error(1)
 }
 
-func (c *mockClient) Bid(id, price uint) (*transferInfoResponse, error) {
+func (c *MockClient) Bid(id, price uint) (*transferInfoResponse, error) {
 	args := c.Called(id, price)
 	return args.Get(0).(*transferInfoResponse), args.Error(1)
 }
 
-func (c *mockClient) ClubInfo() (*clubInfoResponse, error) {
+func (c *MockClient) ClubInfo() (*clubInfoResponse, error) {
 	args := c.Called()
 	return args.Get(0).(*clubInfoResponse), args.Error(1)
 }
 
-func (c *mockClient) FetchPlayerInfo(id uint) (*playerInfoResponse, error) {
+func (c *MockClient) FetchPlayerInfo(id uint) (*playerInfoResponse, error) {
 	args := c.Called(id)
 	return args.Get(0).(*playerInfoResponse), args.Error(1)
 }

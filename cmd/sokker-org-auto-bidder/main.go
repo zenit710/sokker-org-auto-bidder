@@ -8,6 +8,7 @@ import (
 	"sokker-org-auto-bidder/internal/client"
 	"sokker-org-auto-bidder/internal/repository/player"
 	"sokker-org-auto-bidder/internal/repository/session"
+	playerbid "sokker-org-auto-bidder/internal/service/player-bid"
 	"sokker-org-auto-bidder/internal/subcommands"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -56,9 +57,12 @@ func main() {
 		sessionRepository,
 	)
 
+	log.Trace("create new http bid player service")
+	playerBidService := playerbid.NewHttpPlayerBidService(playerRepository, client)
+
 	log.Trace("create subcommands registry, register subcommands")
 	subCmdRegistry := subcommands.NewSubcommandRegistry()
-	subCmdRegistry.Register("bid", subcommands.NewBidSubcommand(playerRepository, client))
+	subCmdRegistry.Register("bid", subcommands.NewBidSubcommand(playerRepository, client, playerBidService))
 	subCmdRegistry.Register("add", subcommands.NewPlayerAddSubcommand(playerRepository, client))
 	subCmdRegistry.Register("check-auth", subcommands.NewCheckAuthSubcommand(client))
 
