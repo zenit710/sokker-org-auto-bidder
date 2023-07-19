@@ -107,6 +107,3 @@ func TestRunPlayerBidResults(t *testing.T) {
 		}
 	}
 }
-
-// test run with player handling E2E
-// test player handle errors
