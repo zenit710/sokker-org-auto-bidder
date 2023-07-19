@@ -8,12 +8,24 @@ type MockClient struct {
 	mock.Mock
 }
 
-func (c *MockClient) GetEmptyClubInfoResponse() *clubInfoResponse {
-	return &clubInfoResponse{}
+func (c *MockClient) GetEmptyClubInfoResponse(id uint) *clubInfoResponse {
+	return &clubInfoResponse{Team: team{id}}
 }
 
-func (c *MockClient) GetEmptyPlayerInfoResponse() *playerInfoResponse {
-	return &playerInfoResponse{}
+func (c *MockClient) GetEmptyPlayerInfoResponse(deadlineDate string, minBid uint, buyerId uint) *playerInfoResponse {
+	return &playerInfoResponse{
+		Transfer: transfer{
+			Deadline: playerInfoDeadline{
+				Date: deadlineDate,
+			},
+			Price: price{
+				MinBid: bidState{
+					Value: minBid,
+				},
+			},
+			BuyerId: buyerId,
+		},
+	}
 }
 
 func (c *MockClient) Auth() (*clubInfoResponse, error) {

@@ -43,7 +43,7 @@ func TestRunDbFetchFailure(t *testing.T) {
 func TestRunApiAuthFailure(t *testing.T) {
 	r, c, _, s := createBidSubcommand()
 	r.On("List").Return([]*model.Player{}, nil)
-	c.On("Auth").Return(c.GetEmptyClubInfoResponse(), errors.New("error"))
+	c.On("Auth").Return(c.GetEmptyClubInfoResponse(0), errors.New("error"))
 	_, err := s.Run()
 	if err == nil || !errors.Is(err, ErrApiAuthFailed) {
 		t.Errorf("'%v' expected, '%v' returned", ErrApiAuthFailed, err)
@@ -53,7 +53,7 @@ func TestRunApiAuthFailure(t *testing.T) {
 func TestRunNoListedPlayers(t *testing.T) {
 	r, c, _, s := createBidSubcommand()
 	r.On("List").Return([]*model.Player{}, nil)
-	c.On("Auth").Return(c.GetEmptyClubInfoResponse(), nil)
+	c.On("Auth").Return(c.GetEmptyClubInfoResponse(0), nil)
 	_, err := s.Run()
 	if err != nil {
 		t.Errorf("nil error expected, '%v' returned", err)
@@ -78,7 +78,7 @@ var (
 
 func TestRunPlayerBidResults(t *testing.T) {
 	r, c, b, s := createBidSubcommand()
-	c.On("Auth").Return(c.GetEmptyClubInfoResponse(), nil)
+	c.On("Auth").Return(c.GetEmptyClubInfoResponse(0), nil)
 
 	for _, tc := range bidRunOutputTests {
 		all := append(tc.success, tc.failing...)

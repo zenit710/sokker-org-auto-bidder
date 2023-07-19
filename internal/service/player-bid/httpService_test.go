@@ -13,7 +13,7 @@ func createService() (*player.MockPlayerRepository, *client.MockClient, playerbi
 	r := &player.MockPlayerRepository{}
 	c := &client.MockClient{}
 	s := playerbid.NewHttpPlayerBidService(r, c)
-	return r, c, s	
+	return r, c, s
 }
 
 func TestBidFailedWhenCanNotFetchPlayerInfo(t *testing.T) {
@@ -21,12 +21,12 @@ func TestBidFailedWhenCanNotFetchPlayerInfo(t *testing.T) {
 	var expectedErrType *playerbid.ErrTransferInfoFetchFailed
 
 	_, c, s := createService()
-	c.On("FetchPlayerInfo", p.Id).Return(c.GetEmptyPlayerInfoResponse(), errors.New(""))
+	c.On("FetchPlayerInfo", p.Id).Return(
+		c.GetEmptyPlayerInfoResponse(client.TimeLayout, 1, 1),
+		errors.New(""),
+	)
 
 	if err := s.Bid(p, 0); err == nil || !errors.As(err, &expectedErrType) {
 		t.Errorf("expected '%T' error, got '%T'", expectedErrType, err)
 	}
 }
-
-// TODO change mockClient GetEmptyClubInfoResponse and GetEmptyPlayerInfoResponse
-// allow to create objects based on method arguments
