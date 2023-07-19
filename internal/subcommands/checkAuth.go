@@ -8,7 +8,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var _ Subcommand = &checkAuthSubcommand{}
+var (
+	_             Subcommand = &checkAuthSubcommand{}
+	ErrAuthFailed            = errors.New("authorization error")
+)
 
 // checkAuthSubcommand handle auth check command
 type checkAuthSubcommand struct {
@@ -34,9 +37,10 @@ func (s *checkAuthSubcommand) Run() (interface{}, error) {
 	club, err := s.c.Auth()
 	if err != nil && !errors.Is(err, client.ErrBadCredentials) {
 		log.Error(err)
-		return nil, fmt.Errorf("authorization error")
+		return nil, ErrAuthFailed
 	}
 
+	// TODO move printing values from the Subcommand, we return output as the first value
 	if club == nil {
 		fmt.Printf("Auth failed.\n")
 	} else {

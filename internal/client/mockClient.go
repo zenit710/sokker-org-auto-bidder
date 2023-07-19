@@ -51,7 +51,9 @@ func (c *MockClient) GetTransferInfoResponse(deadline string, minBid, buyerId ui
 
 func (c *MockClient) Auth() (*clubInfoResponse, error) {
 	args := c.Called()
-	return args.Get(0).(*clubInfoResponse), args.Error(1)
+	response, _ := args.Get(0).(*clubInfoResponse)
+
+	return response, args.Error(1)
 }
 
 func (c *MockClient) Bid(id, price uint) (*transferInfoResponse, error) {
