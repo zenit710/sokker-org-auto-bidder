@@ -6,14 +6,14 @@ import (
 	"testing"
 )
 
-func createSubcommand() (*client.MockClient, Subcommand) {
+func createCheckAuthSubcommand() (*client.MockClient, Subcommand) {
 	c := &client.MockClient{}
 	s := NewCheckAuthSubcommand(c)
 	return c, s
 }
 
 func TestRunFailWhenBadCredentials(t *testing.T) {
-	c, s := createSubcommand()
+	c, s := createCheckAuthSubcommand()
 	c.On("Auth").Return(nil, client.ErrBadCredentials)
 
 	if club, _ := s.Run(); club != nil {
@@ -22,7 +22,7 @@ func TestRunFailWhenBadCredentials(t *testing.T) {
 }
 
 func TestRunFailWhenAuthRequestFailed(t *testing.T) {
-	c, s := createSubcommand()
+	c, s := createCheckAuthSubcommand()
 	c.On("Auth").Return(nil, errors.New(""))
 
 	if _, err := s.Run(); err == nil || !errors.Is(err, ErrAuthFailed) {
@@ -31,7 +31,7 @@ func TestRunFailWhenAuthRequestFailed(t *testing.T) {
 }
 
 func TestRunFailNoClubInfo(t *testing.T) {
-	c, s := createSubcommand()
+	c, s := createCheckAuthSubcommand()
 	c.On("Auth").Return(nil, errors.New(""))
 
 	if club, _ := s.Run(); club != nil {
