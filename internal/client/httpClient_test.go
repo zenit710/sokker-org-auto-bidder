@@ -212,3 +212,5 @@ func TestFetchPlayerInfoSuccess(t *testing.T) {
 		t.Error("expected team info, <nil> returned")
 	}
 }
+
+// TODO test Bid() method
