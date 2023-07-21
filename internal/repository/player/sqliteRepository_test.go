@@ -3,6 +3,7 @@ package player
 import (
 	"database/sql"
 	"errors"
+	"sokker-org-auto-bidder/internal/repository"
 	"testing"
 
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
@@ -18,39 +19,19 @@ type listTest struct {
 	expectedSize int
 }
 
-func createSqlitePlayerRepository() (*sql.DB, sqlmock.Sqlmock, *sqlitePlayerRepository) {
+func createSqlitePlayerRepository() (*sql.DB, sqlmock.Sqlmock, PlayerRepository) {
 	db, mock, _ := sqlmock.New()
 	r := NewSqlitePlayerRepository(db)
 
 	return db, mock, r
 }
 
-func TestCreateSchemaFailureWhenDbError(t *testing.T) {
-	db, _, r := createSqlitePlayerRepository()
-	defer db.Close()
-
-	if err := r.CreateSchema(); err == nil || !errors.Is(err, ErrCreateSchemaFailed) {
-		t.Errorf("expected '%v' but '%v' returned", ErrCreateSchemaFailed, err)
-	}
-}
-
-func TestCreateSchemaSuccess(t *testing.T) {
-	db, m, r := createSqlitePlayerRepository()
-	defer db.Close()
-
-	m.ExpectExec("create table .+").WillReturnResult(sqlmock.NewResult(0, 0))
-
-	if err := r.CreateSchema(); err != nil {
-		t.Errorf("expected <nil> but '%v' returned", err)
-	}
-}
-
 func TestInitFailureWhenCanNotCreateDbSchema(t *testing.T) {
 	db, _, r := createSqlitePlayerRepository()
 	defer db.Close()
 
-	if err := r.Init(); err == nil || !errors.Is(err, ErrCanNotCreateDbSchema) {
-		t.Errorf("expected '%v' but '%v' returned", ErrCanNotCreateDbSchema, err)
+	if err := r.Init(); err == nil || !errors.Is(err, repository.ErrCanNotCreateDbSchema) {
+		t.Errorf("expected '%v' but '%v' returned", repository.ErrCanNotCreateDbSchema, err)
 	}
 }
 

@@ -2,14 +2,19 @@ package session
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"sokker-org-auto-bidder/internal/repository"
 	"sokker-org-auto-bidder/tools"
 
 	_ "github.com/mattn/go-sqlite3"
 	log "github.com/sirupsen/logrus"
 )
 
-var _ SessionRepository = &sqliteSessionRepository{}
+var (
+	_               SessionRepository = &sqliteSessionRepository{}
+	ErrNoSessionKey                   = errors.New("could not get session key")
+)
 
 // sqliteSessionRepository handle sqlite connection for sokker.org session
 type sqliteSessionRepository struct {
@@ -29,7 +34,7 @@ func (r *sqliteSessionRepository) Get() (string, error) {
 	row := r.db.QueryRow(`select key from sessions order by id desc`)
 	if err := row.Scan(&key); err != nil {
 		log.Error(err)
-		return key, fmt.Errorf("could not get session key")
+		return key, ErrNoSessionKey
 	}
 
 	return key, nil
@@ -39,7 +44,7 @@ func (r *sqliteSessionRepository) Init() error {
 	log.Trace("sqlite session repository init")
 	if err := r.CreateSchema(); err != nil {
 		log.Error(err)
-		return fmt.Errorf("could not create schema for sqlite db")
+		return repository.ErrCanNotCreateDbSchema
 	}
 
 	return nil

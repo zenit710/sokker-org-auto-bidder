@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"sokker-org-auto-bidder/internal/model"
+	"sokker-org-auto-bidder/internal/repository"
 	"sokker-org-auto-bidder/tools"
 	"time"
 
@@ -16,10 +17,8 @@ import (
 const timeLayout = "2006-01-02 15:04:05"
 
 var (
-	_                       PlayerRepository = &sqlitePlayerRepository{}
-	ErrCreateSchemaFailed                    = errors.New("create schema sql execution failed")
-	ErrCanNotCreateDbSchema                  = errors.New("could not create schema for sqlite db")
-	ErrCanNotFetchPlayers                    = errors.New("could not fetch players to bid")
+	_                     PlayerRepository = &sqlitePlayerRepository{}
+	ErrCanNotFetchPlayers                  = errors.New("could not fetch players to bid")
 )
 
 // sqlitePlayerRepository handle sqlite connection for player bid list
@@ -44,7 +43,7 @@ func (r *sqlitePlayerRepository) CreateSchema() error {
 	log.Trace("create database schema if not exists")
 	if _, err := r.db.Exec(sqlStmt); err != nil {
 		log.Error(err)
-		return ErrCreateSchemaFailed
+		return errors.New("create schema sql execution failed")
 	}
 
 	return nil
@@ -54,7 +53,7 @@ func (r *sqlitePlayerRepository) Init() error {
 	log.Trace("sqlite player repository init")
 	if err := r.CreateSchema(); err != nil {
 		log.Error(err)
-		return ErrCanNotCreateDbSchema
+		return repository.ErrCanNotCreateDbSchema
 	}
 
 	return nil
