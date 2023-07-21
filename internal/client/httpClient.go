@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -77,7 +76,7 @@ func (s *httpClient) ClubInfo() (*clubInfoResponse, error) {
 
 	log.Debugf("club info request http status code: %d", res.StatusCode)
 	if res.StatusCode != http.StatusOK {
-		return nil, errors.New("unauthorized")
+		return nil, ErrUnauthorized
 	}
 
 	log.Trace("parse club info response")

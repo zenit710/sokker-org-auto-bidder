@@ -8,6 +8,8 @@ import (
 var (
 	// ErrBadCredentials is raised when user login/pass is not correct
 	ErrBadCredentials = errors.New("bad credentials")
+	// ErrUnauthorized is raised when trying to get resources without authentication
+	ErrUnauthorized = errors.New("unauthorized")
 )
 
 // ErrRequestFailed is raised when http request can not be send

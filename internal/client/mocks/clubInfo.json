@@ -1,0 +1,96 @@
+{
+  "id": 1898921,
+  "name": "Amateusz",
+  "team": {
+    "id": 52088,
+    "name": "Ropotek Glewiec",
+    "rank": 3802.86,
+    "emblem": "/team-emblem-52088.png",
+    "country": {
+      "code": 1,
+      "name": "Polska"
+    },
+    "colors": {
+      "first": {
+        "shirt": {
+          "hex": "#2ca3ff"
+        },
+        "trousers": {
+          "hex": "#000000"
+        },
+        "type": {
+          "code": 0,
+          "name": "blank"
+        }
+      },
+      "second": {
+        "shirt": {
+          "hex": "#ffffff"
+        },
+        "trousers": {
+          "hex": "#ff4067"
+        },
+        "type": {
+          "code": 0,
+          "name": "blank"
+        }
+      },
+      "keeper": {
+        "shirt": {
+          "hex": "#006d31"
+        },
+        "trousers": {
+          "hex": "#006c3b"
+        },
+        "type": {
+          "code": 0,
+          "name": "blank"
+        }
+      }
+    },
+    "nationalType": 0
+  },
+  "budget": {
+    "value": 13202229,
+    "currency": "z\u0142"
+  },
+  "roles": [],
+  "plus": false,
+  "hasTrialPlus": false,
+  "plusDeadline": null,
+  "today": {
+    "season": 65,
+    "week": 1028,
+    "seasonWeek": 0,
+    "day": 3,
+    "date": {
+      "value": "2023-03-21",
+      "timestamp": 1679385600
+    }
+  },
+  "dateTime": {
+    "date": "2023-03-22 01:26:24.529419",
+    "timezone_type": 3,
+    "timezone": "Europe/Berlin"
+  },
+  "enabledFeatures": [
+    "lineup_squad_v2",
+    "overview",
+    "overview_calendar",
+    "overview_transfers",
+    "pay_paynow",
+    "player_bid_vue"
+  ],
+  "sl": "8cc3b4d6",
+  "nationalTeamId": 0,
+  "nationalTeam": null,
+  "firstLogin": false,
+  "lock": {
+    "transfersLocked": false,
+    "readOnlyMode": false
+  },
+  "settings": {
+    "locale": "pl",
+    "theme": "dark"
+  }
+}
