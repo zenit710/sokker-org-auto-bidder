@@ -2,6 +2,7 @@ package player
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"sokker-org-auto-bidder/internal/model"
 	"sokker-org-auto-bidder/tools"
@@ -14,7 +15,12 @@ import (
 // timeLayout store time.Layout used inside sqlite
 const timeLayout = "2006-01-02 15:04:05"
 
-var _ PlayerRepository = &sqlitePlayerRepository{}
+var (
+	_                       PlayerRepository = &sqlitePlayerRepository{}
+	ErrCreateSchemaFailed                    = errors.New("create schema sql execution failed")
+	ErrCanNotCreateDbSchema                  = errors.New("could not create schema for sqlite db")
+	ErrCanNotFetchPlayers                    = errors.New("could not fetch players to bid")
+)
 
 // sqlitePlayerRepository handle sqlite connection for player bid list
 type sqlitePlayerRepository struct {
@@ -38,7 +44,7 @@ func (r *sqlitePlayerRepository) CreateSchema() error {
 	log.Trace("create database schema if not exists")
 	if _, err := r.db.Exec(sqlStmt); err != nil {
 		log.Error(err)
-		return fmt.Errorf("create schema sql execution failed")
+		return ErrCreateSchemaFailed
 	}
 
 	return nil
@@ -48,7 +54,7 @@ func (r *sqlitePlayerRepository) Init() error {
 	log.Trace("sqlite player repository init")
 	if err := r.CreateSchema(); err != nil {
 		log.Error(err)
-		return fmt.Errorf("could not create schema for sqlite db")
+		return ErrCanNotCreateDbSchema
 	}
 
 	return nil
@@ -79,7 +85,7 @@ func (r *sqlitePlayerRepository) List() ([]*model.Player, error) {
 	rows, err := r.db.Query(`select * from players where deadline > datetime("now")`)
 	if err != nil {
 		log.Error(err)
-		return nil, fmt.Errorf("could not fetch players to bid")
+		return nil, ErrCanNotFetchPlayers
 	}
 	defer rows.Close()
 
