@@ -1,0 +1,161 @@
+{
+  "id": 38867736,
+  "info": {
+    "name": {
+      "name": "Rigan",
+      "surname": "Nurdiansyah",
+      "full": "Rigan Nurdiansyah"
+    },
+    "formation": {
+      "code": 1,
+      "name": "DEF"
+    },
+    "number": 2,
+    "team": {
+      "id": 111647,
+      "name": "MacanPutih Fc",
+      "rank": 3953.45,
+      "emblem": "/team-emblem-111647.png",
+      "country": {
+        "code": 65,
+        "name": "Indonesia"
+      },
+      "colors": {
+        "first": {
+          "shirt": {
+            "hex": "#a610be"
+          },
+          "trousers": {
+            "hex": "#1103d2"
+          },
+          "type": {
+            "code": 1,
+            "name": "stripped"
+          }
+        },
+        "second": {
+          "shirt": {
+            "hex": "#f1ff00"
+          },
+          "trousers": {
+            "hex": "#ffdf33"
+          },
+          "type": {
+            "code": 5,
+            "name": "slant_down"
+          }
+        },
+        "keeper": {
+          "shirt": {
+            "hex": "#0000ff"
+          },
+          "trousers": {
+            "hex": "#000001"
+          },
+          "type": {
+            "code": 6,
+            "name": "slant_up"
+          }
+        }
+      },
+      "nationalType": 0
+    },
+    "country": {
+      "code": 65,
+      "name": "Indonesia"
+    },
+    "value": {
+      "value": 99000,
+      "currency": "z\u0142"
+    },
+    "previousValue": null,
+    "wage": {
+      "value": 2300,
+      "currency": "z\u0142"
+    },
+    "characteristics": {
+      "age": 18,
+      "height": 178,
+      "weight": 80.26,
+      "bmi": 25.33139755081429
+    },
+    "skills": {
+      "form": 7,
+      "tacticalDiscipline": 0,
+      "teamwork": 0,
+      "experience": 0,
+      "stamina": 4,
+      "keeper": 0,
+      "playmaking": 6,
+      "passing": 2,
+      "technique": 1,
+      "defending": 4,
+      "striker": 0,
+      "pace": 5
+    },
+    "stats": {
+      "cards": {
+        "cards": 0,
+        "yellow": 0,
+        "red": 0
+      },
+      "goals": 0,
+      "assists": 0,
+      "matches": 0
+    },
+    "nationalStats": {
+      "cards": {
+        "cards": 0,
+        "yellow": 0,
+        "red": 0
+      },
+      "goals": 0,
+      "assists": 0,
+      "matches": 0
+    },
+    "face": {
+      "face": 2,
+      "skinColor": 3,
+      "hairColor": 5,
+      "hair": 4,
+      "eyes": 6,
+      "nose": 6,
+      "beard": 8,
+      "beardColor": 8,
+      "shirt": 1,
+      "mouth": 9
+    },
+    "youthTeamId": 111647,
+    "injury": {
+      "daysRemaining": 0,
+      "severe": false
+    },
+    "nationalSharing": true
+  },
+  "transfer": {
+    "deadline": {
+      "date": "2023-03-22 01:35:25.000000",
+      "timezone_type": 3,
+      "timezone": "Europe/Berlin"
+    },
+    "price": {
+      "listed": {
+        "value": 40,
+        "currency": "z\u0142"
+      },
+      "bid": {
+        "value": 40,
+        "currency": "z\u0142"
+      },
+      "minBid": {
+        "value": 5040,
+        "currency": "z\u0142"
+      },
+      "suggestedBid": {
+        "value": 6000,
+        "currency": "z\u0142"
+      }
+    },
+    "buyerId": 40799
+  }
+}

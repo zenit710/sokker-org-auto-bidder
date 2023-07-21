@@ -29,3 +29,12 @@ type ErrResponseParseFailed struct {
 func (e *ErrResponseParseFailed) Error() string {
 	return fmt.Sprintf("'%s' response could not be parsed", e.Type)
 }
+
+// ErrResourceUnavailable is raised when can not fetch resource
+type ErrResourceUnavailable struct {
+	resource string
+}
+
+func (e *ErrResourceUnavailable) Error() string {
+	return fmt.Sprintf("resouce unavailable: %s", e.resource)
+}

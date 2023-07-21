@@ -100,7 +100,7 @@ func (s *httpClient) FetchPlayerInfo(id uint) (*playerInfoResponse, error) {
 
 	log.Debugf("fetch player (%d) info request http status code: %d", id, res.StatusCode)
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("player (%d) details can not be fetched", id)
+		return nil, &ErrResourceUnavailable{fmt.Sprintf("player (%d) details", id)}
 	}
 
 	log.Tracef("parse player (%d) info response", id)
