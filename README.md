@@ -67,5 +67,5 @@ You can build app after changes using `make`. `soab` executable will be built in
 
 - log debug/info/warning/errors to the file: https://gist.github.com/huobazi/80805158fe1f2cac7170fe68c37741ab
 - test all cases after db logic change
-- write unit tests
 - split tools into directories
+- add workflows to: unit test, lint test, PR approve, release build
