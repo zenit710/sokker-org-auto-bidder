@@ -38,3 +38,12 @@ type ErrResourceUnavailable struct {
 func (e *ErrResourceUnavailable) Error() string {
 	return fmt.Sprintf("resouce unavailable: %s", e.resource)
 }
+
+// ErrNoFunds is raised when can not bid player because lack of funds
+type ErrNoFunds struct {
+	id uint
+}
+
+func (e *ErrNoFunds) Error() string {
+	return fmt.Sprintf("no funds for player (%d) bid", e.id)
+}

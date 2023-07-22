@@ -69,5 +69,3 @@ You can build app after changes using `make`. `soab` executable will be built in
 - test all cases after db logic change
 - write unit tests
 - split tools into directories
-- bid subcommand:
-  - handle no funds for bid

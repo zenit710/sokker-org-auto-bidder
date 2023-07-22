@@ -1,0 +1,232 @@
+{
+  "transfer": {
+    "player": {
+      "id": 36669801,
+      "info": {
+        "name": {
+          "name": "Erivelto",
+          "surname": "Dominicano",
+          "full": "Erivelto Dominicano"
+        },
+        "formation": null,
+        "number": null,
+        "team": {
+          "id": 43422,
+          "name": "Team tourist",
+          "rank": 4923.14,
+          "emblem": "/team-emblem-43422.png",
+          "country": {
+            "code": 16,
+            "name": "France"
+          },
+          "colors": {
+            "first": {
+              "shirt": {
+                "hex": "#00ff00"
+              },
+              "trousers": {
+                "hex": "#ff0100"
+              },
+              "type": {
+                "code": 0,
+                "name": "blank"
+              }
+            },
+            "second": {
+              "shirt": {
+                "hex": "#00f3ff"
+              },
+              "trousers": {
+                "hex": "#ffec00"
+              },
+              "type": {
+                "code": 0,
+                "name": "blank"
+              }
+            },
+            "keeper": {
+              "shirt": {
+                "hex": "#ff00ff"
+              },
+              "trousers": {
+                "hex": "#fe001d"
+              },
+              "type": {
+                "code": 0,
+                "name": "blank"
+              }
+            }
+          },
+          "nationalType": 0
+        },
+        "country": {
+          "code": 21,
+          "name": "Brasil"
+        },
+        "value": {
+          "value": 6005000,
+          "currency": "z\u0142"
+        },
+        "previousValue": {
+          "value": 5993000,
+          "currency": "z\u0142"
+        },
+        "wage": {
+          "value": 70700,
+          "currency": "z\u0142"
+        },
+        "characteristics": {
+          "age": 31,
+          "height": 172,
+          "weight": 70.7493,
+          "bmi": 23.914717414818824
+        },
+        "skills": {
+          "form": 18,
+          "tacticalDiscipline": 13,
+          "teamwork": 12,
+          "experience": 15,
+          "stamina": 11,
+          "keeper": 0,
+          "playmaking": 6,
+          "passing": 7,
+          "technique": 13,
+          "defending": 5,
+          "striker": 17,
+          "pace": 14
+        },
+        "skillsChange": {
+          "form": 0,
+          "tacticalDiscipline": 0,
+          "teamwork": 0,
+          "experience": 0,
+          "stamina": 0,
+          "keeper": 0,
+          "playmaking": 0,
+          "passing": 0,
+          "technique": 0,
+          "defending": 0,
+          "striker": 0,
+          "pace": 0,
+          "down": 0,
+          "up": 0
+        },
+        "stats": {
+          "cards": {
+            "cards": 1,
+            "yellow": 1,
+            "red": 0
+          },
+          "goals": 201,
+          "assists": 29,
+          "matches": 176
+        },
+        "nationalStats": {
+          "cards": {
+            "cards": 0,
+            "yellow": 0,
+            "red": 0
+          },
+          "goals": 0,
+          "assists": 0,
+          "matches": 0
+        },
+        "face": {
+          "face": 9,
+          "skinColor": 3,
+          "hairColor": 3,
+          "hair": 7,
+          "eyes": 6,
+          "nose": 6,
+          "beard": 1,
+          "beardColor": 5,
+          "shirt": 1,
+          "mouth": 8
+        },
+        "youthTeamId": 78868,
+        "injury": {
+          "daysRemaining": 0,
+          "severe": false
+        }
+      }
+    },
+    "deadline": {
+      "date": {
+        "date": "2022-12-02 19:31:09.000000",
+        "timezone_type": 3,
+        "timezone": "Europe/Berlin"
+      },
+      "secondsLeft": 22005,
+      "daysLeft": 0
+    },
+    "ended": false,
+    "price": {
+      "listed": {
+        "value": 20,
+        "currency": "z\u0142"
+      },
+      "bid": {
+        "value": 456000,
+        "currency": "z\u0142"
+      },
+      "minBid": {
+        "value": 465120,
+        "currency": "z\u0142"
+      },
+      "suggestedBid": {
+        "value": 466000,
+        "currency": "z\u0142"
+      }
+    },
+    "buyer": {
+      "id": 45675,
+      "name": "Viseu e Mantorras FC",
+      "rank": 4482.9,
+      "emblem": "/team-emblem-45675.png",
+      "country": {
+        "code": 20,
+        "name": "Portugal"
+      },
+      "colors": {
+        "first": {
+          "shirt": {
+            "hex": "#ff0000"
+          },
+          "trousers": {
+            "hex": "#ffffff"
+          },
+          "type": {
+            "code": 0,
+            "name": "blank"
+          }
+        },
+        "second": {
+          "shirt": {
+            "hex": "#8891a8"
+          },
+          "trousers": {
+            "hex": "#b6b7d2"
+          },
+          "type": {
+            "code": 1,
+            "name": "stripped"
+          }
+        },
+        "keeper": {
+          "shirt": {
+            "hex": "#ff0000"
+          },
+          "trousers": {
+            "hex": "#ffff01"
+          },
+          "type": {
+            "code": 0,
+            "name": "blank"
+          }
+        }
+      },
+      "nationalType": 0
+    },
+    "observers": 19
+  }
+}

@@ -128,11 +128,11 @@ func (s *httpClient) Bid(id, price uint) (*transferInfoResponse, error) {
 
 	log.Debugf("player (%d) bid request http status code: %d", id, res.StatusCode)
 	if res.StatusCode == http.StatusBadRequest {
-		return nil, fmt.Errorf("no funds for player (%d) bid", id)
+		return nil, &ErrNoFunds{}
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("player (%d) bid response failed", id)
+		return nil, &ErrResourceUnavailable{}
 	}
 
 	log.Tracef("parse player (%d) bid response", id)
